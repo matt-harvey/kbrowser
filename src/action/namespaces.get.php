@@ -6,21 +6,22 @@ use App\Layout\DefaultLayout;
 
 $cluster = getCluster();
 $namespaces = $cluster->getNamespaces();
-$currentNamespace = $cluster->getCurrentNamespace();
+
+$title = 'Namespaces';
+$breadcrumbs = [
+    'home' => '/',
+    'namespaces' => null,
+];
 
 ?>
 
-<?php DefaultLayout::open('Namespaces'); ?>
+<?php DefaultLayout::open($title, $breadcrumbs) ?>
     <div>
         <ul>
             <?php foreach ($namespaces as $namespace): ?>
                 <li>
                     <a href="<?= '/pods?' . \http_build_query(['namespace' => $namespace]) ?>">
-                        <?php if ($namespace === $currentNamespace): ?>
-                            <b><?= h($namespace) ?></b>
-                        <?php else: ?>
-                            <?= h($namespace) ?>
-                        <?php endif; ?>
+                        <?= h($namespace) ?>
                     </a>
                 </li>
             <?php endforeach; ?>

@@ -21,6 +21,18 @@ class Kubernetes
         return $namespaces;
     }
 
+    public function describePod(string $namespace, string $pod): string
+    {
+        $command = 'kubectl describe';
+        $command .= ' --namespace=' . \escapeshellarg($namespace);
+        $command .= ' ' . \escapeshellarg($pod);
+        \exec($command, $output, $resultCode);
+        if ($resultCode != 0) {
+            throw new \Exception('Could not describe pod');
+        }
+        return \implode(PHP_EOL, $output);
+    }
+
     public function getCurrentNamespace(): string
     {
         \exec('kubectl ns --current', $currentNamespace, $resultCode);
@@ -34,13 +46,10 @@ class Kubernetes
     }
 
     /** @return array<string> */
-    public function getPods(?string $namespace = null): array
+    public function getPods(string $namespace): array
     {
-        $command = 'kubectl get pods -o name';
-        if ($namespace !== null) {
-            $escapedNamespace = \escapeshellarg($namespace);
-           $command .= " --namespace=$escapedNamespace";
-        }
+        $escapedNamespace = \escapeshellarg($namespace);
+        $command = "kubectl get pods -o name --namespace=$escapedNamespace";
         \exec($command, $pods, $resultCode);
         return $pods;
     }

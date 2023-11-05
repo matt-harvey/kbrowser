@@ -8,10 +8,10 @@ define('PATH', \parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
 function main(): void
 {
-    $urlPath = (PATH === '/' ? '' : PATH);
+    $urlPath = (PATH === '/' ? '_root' : PATH);
     $method = $_SERVER['REQUEST_METHOD'];
     $lowerMethod = \strtolower($method);
-    $action = ACTION_ROOT . "/$urlPath/$lowerMethod.php";
+    $action = ACTION_ROOT . "/$urlPath.$lowerMethod.php";
     if (!\file_exists($action)) {
         \http_response_code(404);
         return;

@@ -35,3 +35,15 @@ function getCluster(): Kubernetes
 {
     return new Kubernetes();
 }
+
+function simplifiedPodName(string $fullPodName): string
+{
+    return \preg_replace('/^pod\//', '', $fullPodName);
+}
+
+function podUrl(string $namespace, string $pod): string
+{
+    $query = \http_build_query(['namespace' => $namespace, 'pod' => $pod]);
+    return "/pod?$query";
+}
+
