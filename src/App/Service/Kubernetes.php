@@ -14,11 +14,14 @@ class Kubernetes
     /** @return array<string> */
     public function getNamespaces(): array
     {
-        \exec('kubectl ns', $namespaces, $resultCode);
+        \exec('kubectl get namespaces -o name', $namespaces, $resultCode);
         if ($resultCode != 0) {
             throw new \Exception('Error getting namespaces');
         }
-        return $namespaces;
+        return \array_map(
+            fn ($ns) => \preg_replace('/^namespace\//', '', $ns),
+            $namespaces,
+        );
     }
 
     public function describePod(string $namespace, string $pod): string
@@ -35,7 +38,11 @@ class Kubernetes
 
     public function getCurrentNamespace(): string
     {
-        \exec('kubectl ns --current', $currentNamespace, $resultCode);
+        \exec(
+            "kubectl ns --current view --minify -o jsonpath='{..namespace}'",
+            $currentNamespace,
+            $resultCode,
+        );
         if ($resultCode != 0) {
             throw new \Exception('Error getting current namespace');
         }
