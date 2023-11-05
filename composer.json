@@ -5,7 +5,7 @@
     "license": "Proprietary",
     "autoload": {
         "psr-4": {
-            "MattHarvey\\Kbrowser\\": "src/"
+            "App\\": "src/App"
         }
     },
     "authors": [
@@ -14,5 +14,7 @@
             "email": "software@matthewharvey.net"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^8.2"
+    }
 }
