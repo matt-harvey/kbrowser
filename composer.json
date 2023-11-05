@@ -1,0 +1,18 @@
+{
+    "name": "matt-harvey/kbrowser",
+    "description": "Web UI for exploring a Kubernetes cluster from your local machine",
+    "type": "project",
+    "license": "Proprietary",
+    "autoload": {
+        "psr-4": {
+            "MattHarvey\\Kbrowser\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Matthew Harvey",
+            "email": "software@matthewharvey.net"
+        }
+    ],
+    "require": {}
+}
