@@ -15,6 +15,7 @@ class DefaultLayout
         </head>
 
         <body>
+        <h1><?= h($title) ?></h1>
         <?php
     }
 

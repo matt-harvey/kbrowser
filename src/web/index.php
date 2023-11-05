@@ -13,7 +13,7 @@ function main(): void
     $lowerMethod = \strtolower($method);
     $action = ACTION_ROOT . "/$urlPath/$lowerMethod.php";
     if (!\file_exists($action)) {
-        http_response_code(404);
+        \http_response_code(404);
         return;
     }
     require $action;

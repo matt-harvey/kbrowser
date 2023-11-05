@@ -7,8 +7,12 @@ use App\Layout\DefaultLayout;
 ?>
 
 <?php DefaultLayout::open('Kbrowser'); ?>
-    <h1>Kbrowser</h1>
     <div>
-        FIXME nav menu
+        <nav>
+            <ul>
+                <li><a href="/namespaces">Namespaces</a></li>
+                <li><a href="/pods">Pods</a></li>
+            </ul>
+        </nav>
     </div>
 <?php DefaultLayout::close(); ?>
