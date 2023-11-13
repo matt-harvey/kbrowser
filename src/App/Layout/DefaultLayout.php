@@ -27,6 +27,9 @@ class DefaultLayout
                     text-decoration: none;
                     color: green;
                 }
+                table {
+                    border-spacing: 1em 0;
+                }
             </style>
         </head>
 

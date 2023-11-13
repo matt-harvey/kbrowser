@@ -55,6 +55,18 @@ class Kubernetes
         return \implode(PHP_EOL, $output);
     }
 
+    public function describeDaemonSet(string $daemonSet, string $namespace): string
+    {
+        $command = 'kubectl describe daemonset';
+        $command .= ' -n ' . \escapeshellarg($namespace);
+        $command .= ' ' . \escapeshellarg($daemonSet);
+        \exec($command, $output, $resultCode);
+        if ($resultCode != 0) {
+            throw new \Exception('Could not describe daemonset');
+        }
+        return \implode(PHP_EOL, $output);
+    }
+
     public function getCurrentNamespace(): string
     {
         \exec(
@@ -144,6 +156,38 @@ class Kubernetes
             }
             [$deployment, $namespace] = \preg_split('/\s+/', $line);
             $result[] = ['deployment' => $deployment, 'namespace' => $namespace];
+        }
+        return $result;
+    }
+
+    /** @return array<string> */
+    public function getDaemonSets(string $namespace): array
+    {
+        $command = "kubectl get daemonsets -o name";
+        $escapedNamespace = \escapeshellarg($namespace);
+        $command .= " --namespace=$escapedNamespace";
+        \exec($command, $daemonSets, $resultCode);
+        if ($resultCode != 0) {
+            throw new \Exception('Error getting daemonsets');
+        }
+        return \array_map(simplifiedDaemonSetName(...), $daemonSets);
+    }
+
+    /** @return array<array<string, string>> */
+    public function getDaemonSetsWithNamespaces(): array
+    {
+        $command = 'kubectl get daemonsets -A -o custom-columns=":metadata.name,:metadata.namespace"';
+        \exec($command, $daemonSets, $resultCode);
+        if ($resultCode != 0) {
+            throw new \Exception('Error getting daemonsets');
+        }
+        $result = [];
+        foreach ($daemonSets as $line) {
+            if (\strlen(\trim($line)) == 0) {
+                continue;
+            }
+            [$daemonSet, $namespace] = \preg_split('/\s+/', $line);
+            $result[] = ['daemonSet' => $daemonSet, 'namespace' => $namespace];
         }
         return $result;
     }
