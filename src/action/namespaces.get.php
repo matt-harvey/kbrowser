@@ -9,22 +9,26 @@ $namespaces = $cluster->getNamespaces();
 
 $title = 'Namespaces';
 $breadcrumbs = [
-    'home' => '/',
-    'namespaces' => null,
+    [$cluster->getShortClusterName() => '/'],
+    ['namespaces' => null],
 ];
 
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
     <div>
-        <ul>
-            <?php foreach ($namespaces as $namespace): ?>
-                <li>
-                    <a href="<?= '/pods?' . \http_build_query(['namespace' => $namespace]) ?>">
-                        <?= h($namespace) ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <table>
+            <tbody>
+                <?php foreach ($namespaces as $namespace): ?>
+                    <tr>
+                        <td>
+                            <a href="<?= namespaceUrl($namespace) ?>">
+                                <?= h($namespace) ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 <?php DefaultLayout::close(); ?>

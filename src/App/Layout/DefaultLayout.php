@@ -4,7 +4,7 @@ namespace App\Layout;
 
 class DefaultLayout
 {
-    /** @param array<string, string> $breadcrumbs */
+    /** @param array<array<string, string|null>> $breadcrumbs */
     public static function open(string $title, array $breadcrumbs = []): void
     {
         ?>
@@ -13,6 +13,21 @@ class DefaultLayout
         <head>
             <title><?= h($title) ?></title>
             <meta charset="utf8">
+            <style>
+                * {
+                    font-family: monospace;
+                }
+                body {
+                    line-height: 1.25em;
+                }
+                pre {
+                    line-height: 1.125em;
+                }
+                a {
+                    text-decoration: none;
+                    color: green;
+                }
+            </style>
         </head>
 
         <body>
@@ -20,8 +35,11 @@ class DefaultLayout
         <?php if (\count($breadcrumbs) != 0): ?>
             <nav>
                 <?php $i = 0; ?>
-                <?php foreach ($breadcrumbs as $label => $url): ?>
-                    <?php if ($i != 0): ?> / <?php endif; ?>
+                <?php foreach ($breadcrumbs as $breadcrumb): ?>
+                    <?php $label = \array_keys($breadcrumb)[0]; ?>
+                    <?php $url = \array_values($breadcrumb)[0]; ?>
+
+                    <?php if ($i != 0): ?> &rightarrow; <?php endif; ?>
                     <?php if ($url === null): ?>
                         <?= h($label) ?>
                     <?php else: ?>
@@ -32,6 +50,8 @@ class DefaultLayout
                 <?php endforeach; ?>
             </nav>
         <?php endif; ?>
+
+        <hr>
 
         <?php
     }

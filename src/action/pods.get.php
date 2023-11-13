@@ -5,29 +5,63 @@ declare(strict_types=1);
 use App\Layout\DefaultLayout;
 
 $cluster = getCluster();
-$namespace = $_GET['namespace'] ?? $cluster->getCurrentNamespace();
-$pods = $cluster->getPods($namespace);
+$namespace = $_GET['namespace'] ?? null;
 
 $title = 'Pods';
-$breadcrumbs = [
-    'home' => '/',
-    'namespaces' => '/namespaces',
-    $namespace => null,
-    'pods' => null,
-];
 
+if ($namespace === null) {
+    $pods = $cluster->getPodsWithNamespaces();
+    $breadcrumbs = [
+        [$cluster->getShortClusterName() => '/'],
+        ['pods' => null],
+    ];
+} else {
+    $pods = \array_map(
+        fn ($p) => ['pod' => $p, 'namespace' => $namespace],
+        $cluster->getPods($namespace),
+    );
+    $breadcrumbs = [
+        [$cluster->getShortClusterName() => '/'],
+        ['namespaces' => '/namespaces'],
+        [$namespace => namespaceUrl($namespace)],
+        ['pods' => null],
+    ];
+}
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
-    <div>
-        <ul>
-            <?php foreach ($pods as $pod): ?>
-                <li>
-                    <a href="<?= podUrl($namespace, $pod) ?>">
-                        <?= h(simplifiedPodName($pod)) ?>
+<div>
+    <table>
+        <br>
+        <?php if ($namespace === null): ?>
+            <thead>
+            <tr>
+                <td><b>Namespace</b></td>
+                <td><b>Pod</b></td>
+            </tr>
+            </thead>
+        <?php endif; ?>
+
+        <tbody>
+        <?php foreach ($pods as $pod): ?>
+            <tr>
+                <?php if ($namespace === null): ?>
+                    <td>
+                        <a href="<?= namespaceUrl($pod['namespace']) ?>">
+                            <?= h($pod['namespace']) ?>
+                        </a>
+                    </td>
+                <?php endif; ?>
+
+                <td>
+                    <a href="<?= podUrl($pod['pod'], $pod['namespace']) ?>">
+                        <?= h($pod['pod']) ?>
                     </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
+
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
 <?php DefaultLayout::close(); ?>

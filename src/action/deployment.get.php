@@ -6,23 +6,24 @@ use App\Layout\DefaultLayout;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] or die('No namespace specified');
-$pod = $_GET['pod'] or die('No pod specified');
-$podDescription = $cluster->describePod($pod, $namespace);
+$deployment = $_GET['deployment'] or die('No deployment specified');
+$deploymentDescription = $cluster->describeDeployment($deployment, $namespace);
 
-$title = $pod;
+$title = $deployment;
 $breadcrumbs = [
     [$cluster->getShortClusterName() => '/'],
     ['namespaces' => '/namespaces'],
     [$namespace => namespaceUrl($namespace)],
-    ['pods' => '/pods?' . \http_build_query(['namespace' => $namespace])],
-    [$pod  => null],
+    ['deployments' => '/deployments?' . \http_build_query(['namespace' => $namespace])],
+    [$deployment  => null],
 ];
+
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
     <div>
         <pre>
-<?= h($podDescription) ?>
+<?= h($deploymentDescription) ?>
         </pre>
     </div>
 <?php DefaultLayout::close(); ?>

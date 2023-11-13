@@ -41,9 +41,33 @@ function simplifiedPodName(string $fullPodName): string
     return \preg_replace('/^pod\//', '', $fullPodName);
 }
 
-function podUrl(string $namespace, string $pod): string
+function simplifiedDeploymentName(string $fullDeploymentName): string
 {
-    $query = \http_build_query(['namespace' => $namespace, 'pod' => $pod]);
+    return \preg_replace('/^.+\//', '', $fullDeploymentName);
+}
+
+function namespaceUrl(string $namespace): string
+{
+    return '/namespace?' . \http_build_query(['namespace' => $namespace]);
+}
+
+function podUrl(string $pod, string $namespace): string
+{
+    $data = ['pod' => \preg_replace('/^pod\//', '', $pod)];
+    if ($namespace !== null) {
+        $data['namespace'] = $namespace;
+    }
+    $query = \http_build_query($data);
     return "/pod?$query";
+}
+
+function deploymentUrl(string $deployment, ?string $namespace): string
+{
+    $data = ['deployment' => $deployment];
+    if ($namespace !== null) {
+        $data['namespace'] = $namespace;
+    }
+    $query = \http_build_query($data);
+    return "/deployment?$query";
 }
 
