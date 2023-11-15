@@ -24,4 +24,7 @@ $breadcrumbs = [
     <p>
         <a href="/daemonsets">DaemonSets</a>
     </p>
+    <p>
+        <a href="/statefulsets">StatefulSets</a>
+    </p>
 <?php DefaultLayout::close(); ?>

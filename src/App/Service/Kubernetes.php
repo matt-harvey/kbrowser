@@ -60,6 +60,11 @@ class Kubernetes
         return $this->describeResource('daemonset', $namespace, $daemonSet);
     }
 
+    public function describeStatefulSet(string $statefulSet, string $namespace): string
+    {
+        return $this->describeResource('statefulset', $namespace, $statefulSet);
+    }
+
     public function getCurrentNamespace(): string
     {
         $currentNamespace = $this->runConsoleCommand(
@@ -155,6 +160,32 @@ class Kubernetes
             }
             [$daemonSet, $namespace] = \preg_split('/\s+/', $line);
             $result[] = ['daemonSet' => $daemonSet, 'namespace' => $namespace];
+        }
+        return $result;
+    }
+
+    /** @return array<string> */
+    public function getStatefulSets(string $namespace): array
+    {
+        $command = "kubectl get statefulsets -o name";
+        $escapedNamespace = \escapeshellarg($namespace);
+        $command .= " --namespace=$escapedNamespace";
+        $statefulSets = $this->runConsoleCommand($command);
+        return \array_map(simplifiedStatefulSetName(...), $statefulSets);
+    }
+
+    /** @return array<array<string, string>> */
+    public function getStatefulSetsWithNamespaces(): array
+    {
+        $command = 'kubectl get statefulsets -A -o custom-columns=":metadata.name,:metadata.namespace"';
+        $statefulSets = $this->runConsoleCommand($command);
+        $result = [];
+        foreach ($statefulSets as $line) {
+            if (\strlen(\trim($line)) == 0) {
+                continue;
+            }
+            [$statefulSet, $namespace] = \preg_split('/\s+/', $line);
+            $result[] = ['statefulSet' => $statefulSet, 'namespace' => $namespace];
         }
         return $result;
     }

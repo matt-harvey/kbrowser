@@ -51,6 +51,11 @@ function simplifiedDaemonSetName(string $fullDaemonSetName): string
     return \preg_replace('/^.+\//', '', $fullDaemonSetName);
 }
 
+function simplifiedStatefulSetName(string $fullStatefulSetName): string
+{
+    return \preg_replace('/^.+\//', '', $fullStatefulSetName);
+}
+
 function namespaceUrl(string $namespace): string
 {
     return '/namespace?' . \http_build_query(['namespace' => $namespace]);
@@ -78,11 +83,21 @@ function deploymentUrl(string $deployment, ?string $namespace): string
 
 function daemonSetUrl(string $daemonSet, ?string $namespace): string
 {
-    $data = ['daemonSet' => $daemonSet];
+    $data = ['statefulSet' => $daemonSet];
     if ($namespace !== null) {
         $data['namespace'] = $namespace;
     }
     $query = \http_build_query($data);
-    return "/daemonset?$query";
+    return "/statefulset?$query";
+}
+
+function statefulSetUrl(string $statefulSet, ?string $namespace): string
+{
+    $data = ['statefulSet' => $statefulSet];
+    if ($namespace !== null) {
+        $data['namespace'] = $namespace;
+    }
+    $query = \http_build_query($data);
+    return "/statefulset?$query";
 }
 

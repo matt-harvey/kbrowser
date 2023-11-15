@@ -17,6 +17,7 @@ $breadcrumbs = [
 $podsPath = '/pods?' . \http_build_query(['namespace' => $namespace]);
 $deploymentsPath = '/deployments?' . \http_build_query(['namespace' => $namespace]);
 $daemonSetsPath = '/daemonsets?' . \http_build_query(['namespace' => $namespace]);
+$statefulSetsPath = '/statefulsets?' . \http_build_query(['namespace' => $namespace]);
 
 ?>
 
@@ -29,5 +30,8 @@ $daemonSetsPath = '/daemonsets?' . \http_build_query(['namespace' => $namespace]
     </p>
     <p>
         <a href="<?= $daemonSetsPath ?>">DaemonSets</a>
+    </p>
+    <p>
+        <a href="<?= $statefulSetsPath ?>">StatefulSets</a>
     </p>
 <?php DefaultLayout::close(); ?>
