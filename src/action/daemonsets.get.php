@@ -17,7 +17,7 @@ if ($namespace === null) {
     ];
 } else {
     $daemonsets = \array_map(
-        fn ($d) => ['daemonSet' => $d, 'namespace' => $namespace],
+        fn ($d) => ['daemonset' => $d, 'namespace' => $namespace],
         $cluster->getDaemonSets($namespace),
     );
     $breadcrumbs = [
@@ -54,8 +54,8 @@ if ($namespace === null) {
                         <?php endif; ?>
 
                         <td>
-                            <a href="<?= daemonSetUrl($daemonSet['daemonSet'], $daemonSet['namespace']) ?>">
-                                <?= h($daemonSet['daemonSet']) ?>
+                            <a href="<?= daemonSetUrl($daemonSet['daemonset'], $daemonSet['namespace']) ?>">
+                                <?= h($daemonSet['daemonset']) ?>
                             </a>
 
                         </td>

@@ -3,11 +3,12 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ResourceType;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] or die('No namespace specified');
 $pod = $_GET['pod'] or die('No pod specified');
-$podDescription = $cluster->describePod($pod, $namespace);
+$podDescription = $cluster->describe(ResourceType::POD, $namespace, $pod);
 
 $title = $pod;
 $breadcrumbs = [

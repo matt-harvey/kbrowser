@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 require PROJECT_ROOT . '/vendor/autoload.php';
 
+use App\ResourceType;
 use App\Service\Kubernetes;
 
 // bootstrapping
@@ -56,6 +57,15 @@ function simplifiedStatefulSetName(string $fullStatefulSetName): string
     return \preg_replace('/^.+\//', '', $fullStatefulSetName);
 }
 
+function resourcesUrl(ResourceType $resourceType, ?string $namespace = null): string
+{
+    $url = '/' . urlencode($resourceType->pluralSmallTitle());
+    if ($namespace !== null) {
+        $url .= '?' . \http_build_query(['namespace' => $namespace]);
+    }
+    return $url;
+}
+
 function namespaceUrl(string $namespace): string
 {
     return '/namespace?' . \http_build_query(['namespace' => $namespace]);
@@ -63,41 +73,31 @@ function namespaceUrl(string $namespace): string
 
 function podUrl(string $pod, string $namespace): string
 {
-    $data = ['pod' => \preg_replace('/^pod\//', '', $pod)];
-    if ($namespace !== null) {
-        $data['namespace'] = $namespace;
-    }
-    $query = \http_build_query($data);
-    return "/pod?$query";
+    return namespacedResourceUrl(ResourceType::POD, $pod, $namespace);
 }
 
-function deploymentUrl(string $deployment, ?string $namespace): string
+function deploymentUrl(string $deployment, string $namespace): string
 {
-    $data = ['deployment' => $deployment];
-    if ($namespace !== null) {
-        $data['namespace'] = $namespace;
-    }
-    $query = \http_build_query($data);
-    return "/deployment?$query";
+    return namespacedResourceUrl(ResourceType::DEPLOYMENT, $deployment, $namespace);
 }
 
-function daemonSetUrl(string $daemonSet, ?string $namespace): string
+function daemonSetUrl(string $daemonSet, string $namespace): string
 {
-    $data = ['statefulSet' => $daemonSet];
-    if ($namespace !== null) {
-        $data['namespace'] = $namespace;
-    }
-    $query = \http_build_query($data);
-    return "/statefulset?$query";
+    return namespacedResourceUrl(ResourceType::DAEMON_SET, $daemonSet, $namespace);
 }
 
-function statefulSetUrl(string $statefulSet, ?string $namespace): string
+function statefulSetUrl(string $statefulSet, string $namespace): string
 {
-    $data = ['statefulSet' => $statefulSet];
-    if ($namespace !== null) {
-        $data['namespace'] = $namespace;
-    }
-    $query = \http_build_query($data);
-    return "/statefulset?$query";
+    return namespacedResourceUrl(ResourceType::STATEFUL_SET, $statefulSet, $namespace);
+}
+
+function namespacedResourceUrl(ResourceType $resourceType, string $resourceName, string $namespace): string
+{
+    $resourceTypeSmallTitle = $resourceType->smallTitle();
+    $query = \http_build_query([
+        ResourceType::NAMESPACE->smallTitle() => $namespace,
+        $resourceTypeSmallTitle => $resourceName,
+    ]);
+    return "/$resourceTypeSmallTitle?$query";
 }
 

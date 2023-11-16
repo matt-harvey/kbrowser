@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\ResourceType;
+
 class Kubernetes
 {
     /** @return array<string> the output */
@@ -35,34 +37,14 @@ class Kubernetes
         );
     }
 
-    private function describeResource(string $resourceType, string $namespace, string $resourceName): string
+    public function describe(ResourceType $resourceType, string $namespace, string $resourceName): string
     {
-        $command = "kubectl describe $resourceType";
+        $command = "kubectl describe {$resourceType->smallTitle()}";
         $command .= ' -n ' . \escapeshellarg($namespace);
         $command .= ' ' . \escapeshellarg($resourceName);
         $output = $this->runConsoleCommand($command);
         return \implode(PHP_EOL, $output);
 
-    }
-
-    public function describePod(string $pod, string $namespace): string
-    {
-        return $this->describeResource('pod', $namespace, $pod);
-    }
-
-    public function describeDeployment(string $deployment, string $namespace): string
-    {
-        return $this->describeResource('deployment', $namespace, $deployment);
-    }
-
-    public function describeDaemonSet(string $daemonSet, string $namespace): string
-    {
-        return $this->describeResource('daemonset', $namespace, $daemonSet);
-    }
-
-    public function describeStatefulSet(string $statefulSet, string $namespace): string
-    {
-        return $this->describeResource('statefulset', $namespace, $statefulSet);
     }
 
     public function getCurrentNamespace(): string
@@ -159,7 +141,7 @@ class Kubernetes
                 continue;
             }
             [$daemonSet, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['daemonSet' => $daemonSet, 'namespace' => $namespace];
+            $result[] = ['daemonset' => $daemonSet, 'namespace' => $namespace];
         }
         return $result;
     }
@@ -185,7 +167,7 @@ class Kubernetes
                 continue;
             }
             [$statefulSet, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['statefulSet' => $statefulSet, 'namespace' => $namespace];
+            $result[] = ['statefulset' => $statefulSet, 'namespace' => $namespace];
         }
         return $result;
     }

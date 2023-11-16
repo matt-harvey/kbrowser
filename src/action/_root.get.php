@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ResourceType;
 
 $cluster = getCluster();
 $title = 'KBrowser';
@@ -12,19 +13,11 @@ $breadcrumbs = [
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <p>
-        <a href="/namespaces">Namespaces</a>
-    </p>
-    <p>
-        <a href="/pods">Pods</a>
-    </p>
-    <p>
-        <a href="/deployments">Deployments</a>
-    </p>
-    <p>
-        <a href="/daemonsets">DaemonSets</a>
-    </p>
-    <p>
-        <a href="/statefulsets">StatefulSets</a>
-    </p>
+    <?php foreach (ResourceType::cases() as $resourceType): ?>
+        <p>
+            <a href="<?= resourcesUrl($resourceType) ?>">
+                <?= h($resourceType->pluralTitle()) ?>
+            </a>
+        </p>
+    <?php endforeach; ?>
 <?php DefaultLayout::close(); ?>

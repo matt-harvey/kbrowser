@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\ResourceType;
 use App\Layout\DefaultLayout;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] ?? die('No namespace specified');
-$daemonSet = $_GET['daemonSet'] ?? die('No daemonset specified');
-$daemonSetDescription = $cluster->describeDaemonSet($daemonSet, $namespace);
+$daemonSet = $_GET['daemonset'] ?? die('No daemonset specified');
+$daemonSetDescription = $cluster->describe(ResourceType::DAEMON_SET, $namespace, $daemonSet);
 
 $title = $daemonSet;
 $breadcrumbs = [
