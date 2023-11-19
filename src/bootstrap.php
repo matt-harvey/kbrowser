@@ -37,33 +37,23 @@ function getCluster(): Kubernetes
     return new Kubernetes();
 }
 
-function simplifiedPodName(string $fullPodName): string
+function simplifiedObjectName(string $fullObjectName): string
 {
-    return \preg_replace('/^pod\//', '', $fullPodName);
-}
-
-function simplifiedDeploymentName(string $fullDeploymentName): string
-{
-    return \preg_replace('/^.+\//', '', $fullDeploymentName);
-}
-
-function simplifiedDaemonSetName(string $fullDaemonSetName): string
-{
-    return \preg_replace('/^.+\//', '', $fullDaemonSetName);
-}
-
-function simplifiedStatefulSetName(string $fullStatefulSetName): string
-{
-    return \preg_replace('/^.+\//', '', $fullStatefulSetName);
+    return \preg_replace('/^.+\//', '', $fullObjectName);
 }
 
 function resourcesUrl(ObjectKind $resourceType, ?string $namespace = null): string
 {
-    $url = '/' . urlencode($resourceType->pluralSmallTitle());
+    $query = ['kind' => $resourceType->title()];
     if ($namespace !== null) {
-        $url .= '?' . \http_build_query(['namespace' => $namespace]);
+        $query['namespace'] = $namespace;
     }
-    return $url;
+    return '/resources?' . \http_build_query($query);
+}
+
+function namespacesUrl(): string
+{
+    return '/namespaces';
 }
 
 function namespaceUrl(string $namespace): string
@@ -73,11 +63,11 @@ function namespaceUrl(string $namespace): string
 
 function namespacedResourceUrl(ObjectKind $resourceType, string $resourceName, string $namespace): string
 {
-    $resourceTypeSmallTitle = $resourceType->smallTitle();
-    $query = \http_build_query([
-        ObjectKind::NAMESPACE->smallTitle() => $namespace,
-        $resourceTypeSmallTitle => $resourceName,
-    ]);
-    return "/$resourceTypeSmallTitle?$query";
+    $query = [
+        'namespace' => $namespace,
+        'kind' => $resourceType->title(),
+        'object' => $resourceName,
+    ];
+    return '/resource?' . \http_build_query($query);
 }
 

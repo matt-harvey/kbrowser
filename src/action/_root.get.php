@@ -13,11 +13,17 @@ $breadcrumbs = [
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <?php foreach (ObjectKind::cases() as $resourceType): ?>
-        <p>
-            <a href="<?= resourcesUrl($resourceType) ?>">
-                <?= h($resourceType->pluralTitle()) ?>
-            </a>
-        </p>
+    <?php foreach (ObjectKind::cases() as $objectKind): ?>
+        <?php if ($objectKind === ObjectKind::NAMESPACE): ?>
+            <p>
+                <a href="<?= namespacesUrl() ?>">Namespaces</a>
+            </p>
+        <?php else: ?>
+            <p>
+                <a href="<?= resourcesUrl($objectKind) ?>">
+                    <?= h($objectKind->pluralTitle()) ?>
+                </a>
+            </p>
+        <?php endif; ?>
     <?php endforeach; ?>
 <?php DefaultLayout::close(); ?>

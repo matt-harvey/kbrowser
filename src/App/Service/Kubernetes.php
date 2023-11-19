@@ -16,17 +16,6 @@ class Kubernetes
         return $output;
     }
 
-    private function doExpandPodName(string $namespace, string $podName): string
-    {
-        $pods = $this->runConsoleCommand('kubectl get pods -o name');
-        foreach ($pods as $pod) {
-            if ($pod === $podName) {
-                return $pod;
-            }
-        }
-        throw new \Exception('Could not find pod to expand name');
-    }
-
     /** @return array<string> */
     public function getNamespaces(): array
     {
@@ -59,28 +48,34 @@ class Kubernetes
     }
 
     /** @return array<string> */
-    public function getPods(string $namespace): array
+    public function getObjects(ObjectKind $objectKind, string $namespace): array
     {
-        $command = "kubectl get pods -o name";
+        $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
+        $command = "kubectl get $escapedObjectKindPlural -o name";
         $escapedNamespace = \escapeshellarg($namespace);
         $command .= " --namespace=$escapedNamespace";
         $output = $this->runConsoleCommand($command);
-        return \array_map(simplifiedPodName(...), $output);
+        return \array_map(simplifiedObjectName(...), $output);
     }
 
     /** @return array<array<string, string>> */
-    public function getPodsWithNamespaces(): array
+    public function getObjectsWithNamespaces(ObjectKind $objectKind): array
     {
-        $pods = $this->runConsoleCommand(
-            'kubectl get pods -A -o custom-columns=":metadata.name,:metadata.namespace"',
+        $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
+
+        $objects = $this->runConsoleCommand(
+            "kubectl get $escapedObjectKindPlural -A -o custom-columns=':metadata.name,:metadata.namespace'",
         );
         $result = [];
-        foreach ($pods as $line) {
+        foreach ($objects as $line) {
             if (\strlen(\trim($line)) == 0) {
                 continue;
             }
-            [$pod, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['pod' => $pod, 'namespace' => $namespace];
+            [$object, $namespace] = \preg_split('/\s+/', $line);
+            $result[] = [
+                $objectKind->smallTitle() => $object,
+                'namespace' => $namespace,
+            ];
         }
         return $result;
     }
@@ -93,83 +88,4 @@ class Kubernetes
         }
         return \preg_replace('/^.+\//', '', $names[0]);
     }
-
-    /** @return array<string> */
-    public function getDeployments(string $namespace): array
-    {
-        $command = "kubectl get deployments -o name";
-        $escapedNamespace = \escapeshellarg($namespace);
-        $command .= " --namespace=$escapedNamespace";
-        $deployments = $this->runConsoleCommand($command);
-        return \array_map(simplifiedDeploymentName(...), $deployments);
-    }
-
-    /** @return array<array<string, string>> */
-    public function getDeploymentsWithNamespaces(): array
-    {
-        $command = 'kubectl get deployments -A -o custom-columns=":metadata.name,:metadata.namespace"';
-        $deployments = $this->runConsoleCommand($command);
-        $result = [];
-        foreach ($deployments as $line) {
-            if (\strlen(\trim($line)) == 0) {
-                continue;
-            }
-            [$deployment, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['deployment' => $deployment, 'namespace' => $namespace];
-        }
-        return $result;
-    }
-
-    /** @return array<string> */
-    public function getDaemonSets(string $namespace): array
-    {
-        $command = "kubectl get daemonsets -o name";
-        $escapedNamespace = \escapeshellarg($namespace);
-        $command .= " --namespace=$escapedNamespace";
-        $daemonSets = $this->runConsoleCommand($command);
-        return \array_map(simplifiedDaemonSetName(...), $daemonSets);
-    }
-
-    /** @return array<array<string, string>> */
-    public function getDaemonSetsWithNamespaces(): array
-    {
-        $command = 'kubectl get daemonsets -A -o custom-columns=":metadata.name,:metadata.namespace"';
-        $daemonSets = $this->runConsoleCommand($command);
-        $result = [];
-        foreach ($daemonSets as $line) {
-            if (\strlen(\trim($line)) == 0) {
-                continue;
-            }
-            [$daemonSet, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['daemonset' => $daemonSet, 'namespace' => $namespace];
-        }
-        return $result;
-    }
-
-    /** @return array<string> */
-    public function getStatefulSets(string $namespace): array
-    {
-        $command = "kubectl get statefulsets -o name";
-        $escapedNamespace = \escapeshellarg($namespace);
-        $command .= " --namespace=$escapedNamespace";
-        $statefulSets = $this->runConsoleCommand($command);
-        return \array_map(simplifiedStatefulSetName(...), $statefulSets);
-    }
-
-    /** @return array<array<string, string>> */
-    public function getStatefulSetsWithNamespaces(): array
-    {
-        $command = 'kubectl get statefulsets -A -o custom-columns=":metadata.name,:metadata.namespace"';
-        $statefulSets = $this->runConsoleCommand($command);
-        $result = [];
-        foreach ($statefulSets as $line) {
-            if (\strlen(\trim($line)) == 0) {
-                continue;
-            }
-            [$statefulSet, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = ['statefulset' => $statefulSet, 'namespace' => $namespace];
-        }
-        return $result;
-    }
-
 }

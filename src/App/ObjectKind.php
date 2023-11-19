@@ -4,11 +4,13 @@ namespace App;
 
 enum ObjectKind: string
 {
-    case DAEMON_SET = 'DaemonSet';
-    case DEPLOYMENT = 'Deployment';
     case NAMESPACE = 'Namespace';
     case POD = 'Pod';
+    case DEPLOYMENT = 'Deployment';
+    case DAEMON_SET = 'DaemonSet';
     case STATEFUL_SET = 'StatefulSet';
+    case JOB = 'Job';
+    case CRON_JOB = 'CronJob';
 
     public function smallTitle(): string
     {
@@ -28,5 +30,13 @@ enum ObjectKind: string
     public function pluralTitle(): string
     {
         return $this->title() . 's';
+    }
+
+    public function isNamespaced(): string
+    {
+        return match ($this) {
+            self::NAMESPACE => false,
+            default => true,
+        };
     }
 }

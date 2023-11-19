@@ -7,24 +7,25 @@ use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] or die('No namespace specified');
-$deployment = $_GET['deployment'] or die('No deployment specified');
-$deploymentDescription = $cluster->describe(ObjectKind::DEPLOYMENT, $namespace, $deployment);
+$objectKind = $_GET['kind'] or die('No object kind specified');
+$objectKind = ObjectKind::from($objectKind);
+$objectName = $_GET['object'] or die('No object specified');
+$objectDescription = $cluster->describe(ObjectKind::POD, $namespace, $objectName);
 
-$title = $deployment;
+$title = $objectName;
 $breadcrumbs = [
     [$cluster->getShortClusterName() => '/'],
     ['namespaces' => '/namespaces'],
     [$namespace => namespaceUrl($namespace)],
-    ['deployments' => '/deployments?' . \http_build_query(['namespace' => $namespace])],
-    [$deployment  => null],
+    [$objectKind->pluralSmallTitle() => resourcesUrl($objectKind, $namespace)],
+    [$objectName  => null],
 ];
-
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
     <div>
         <pre>
-<?= h($deploymentDescription) ?>
+<?= h($objectDescription) ?>
         </pre>
     </div>
 <?php DefaultLayout::close(); ?>

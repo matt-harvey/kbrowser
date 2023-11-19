@@ -19,7 +19,7 @@ $breadcrumbs = [
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
     <?php foreach (ObjectKind::cases() as $resourceType): ?>
-        <?php if ($resourceType !== ObjectKind::NAMESPACE): ?>
+        <?php if ($resourceType->isNamespaced()): ?>
             <p>
                 <a href="<?= resourcesUrl($resourceType, $namespace) ?>">
                     <?= h($resourceType->pluralTitle()) ?>
