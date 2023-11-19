@@ -42,9 +42,9 @@ function simplifiedObjectName(string $fullObjectName): string
     return \preg_replace('/^.+\//', '', $fullObjectName);
 }
 
-function resourcesUrl(ObjectKind $resourceType, ?string $namespace = null): string
+function resourcesUrl(ObjectKind $kind, ?string $namespace = null): string
 {
-    $query = ['kind' => $resourceType->title()];
+    $query = ['kind' => $kind->title()];
     if ($namespace !== null) {
         $query['namespace'] = $namespace;
     }

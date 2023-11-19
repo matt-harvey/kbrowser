@@ -26,9 +26,10 @@ class Kubernetes
         );
     }
 
-    public function describe(ObjectKind $resourceType, string $namespace, string $resourceName): string
+    public function describe(ObjectKind $kind, string $namespace, string $resourceName): string
     {
-        $command = "kubectl describe {$resourceType->smallTitle()}";
+        $kind = \escapeshellarg($kind->smallTitle());
+        $command = "kubectl describe $kind";
         $command .= ' -n ' . \escapeshellarg($namespace);
         $command .= ' ' . \escapeshellarg($resourceName);
         $output = $this->runConsoleCommand($command);

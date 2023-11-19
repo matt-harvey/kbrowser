@@ -10,12 +10,12 @@ $namespace = $_GET['namespace'] or die('No namespace specified');
 $objectKind = $_GET['kind'] or die('No object kind specified');
 $objectKind = ObjectKind::from($objectKind);
 $objectName = $_GET['object'] or die('No object specified');
-$objectDescription = $cluster->describe(ObjectKind::POD, $namespace, $objectName);
+$objectDescription = $cluster->describe($objectKind, $namespace, $objectName);
 
 $title = $objectName;
 $breadcrumbs = [
     [$cluster->getShortClusterName() => '/'],
-    ['namespaces' => '/namespaces'],
+    ['namespaces' => namespacesUrl()],
     [$namespace => namespaceUrl($namespace)],
     [$objectKind->pluralSmallTitle() => resourcesUrl($objectKind, $namespace)],
     [$objectName  => null],
