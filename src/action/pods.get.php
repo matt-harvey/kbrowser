@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] ?? null;

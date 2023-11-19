@@ -18,7 +18,7 @@ if ($namespace === null) {
     ];
 } else {
     $statefulsets = \array_map(
-        fn ($d) => ['statefulSet' => $d, 'namespace' => $namespace],
+        fn ($d) => ['statefulset' => $d, 'namespace' => $namespace],
         $cluster->getStatefulSets($namespace),
     );
     $breadcrumbs = [
@@ -55,8 +55,8 @@ if ($namespace === null) {
                         <?php endif; ?>
 
                         <td>
-                            <a href="<?= namespacedResourceUrl(ObjectKind::STATEFUL_SET, $statefulSet['statefulSet'], $statefulSet['namespace']) ?>">
-                                <?= h($statefulSet['statefulSet']) ?>
+                            <a href="<?= namespacedResourceUrl(ObjectKind::STATEFUL_SET, $statefulSet['statefulset'], $statefulSet['namespace']) ?>">
+                                <?= h($statefulSet['statefulset']) ?>
                             </a>
 
                         </td>
