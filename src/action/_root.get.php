@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
-use App\ResourceType;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $title = 'KBrowser';
@@ -13,7 +13,7 @@ $breadcrumbs = [
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <?php foreach (ResourceType::cases() as $resourceType): ?>
+    <?php foreach (ObjectKind::cases() as $resourceType): ?>
         <p>
             <a href="<?= resourcesUrl($resourceType) ?>">
                 <?= h($resourceType->pluralTitle()) ?>

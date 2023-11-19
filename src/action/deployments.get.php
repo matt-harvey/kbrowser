@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] ?? null;
@@ -54,7 +55,7 @@ if ($namespace === null) {
                         <?php endif; ?>
 
                         <td>
-                            <a href="<?= deploymentUrl($deployment['deployment'], $deployment['namespace']) ?>">
+                            <a href="<?= namespacedResourceUrl(ObjectKind::DEPLOYMENT, $deployment['deployment'], $deployment['namespace']) ?>">
                                 <?= h($deployment['deployment']) ?>
                             </a>
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] ?? null;
@@ -54,7 +55,7 @@ if ($namespace === null) {
                         <?php endif; ?>
 
                         <td>
-                            <a href="<?= statefulSetUrl($statefulSet['statefulSet'], $statefulSet['namespace']) ?>">
+                            <a href="<?= namespacedResourceUrl(ObjectKind::STATEFUL_SET, $statefulSet['statefulSet'], $statefulSet['namespace']) ?>">
                                 <?= h($statefulSet['statefulSet']) ?>
                             </a>
 

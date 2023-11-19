@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
-use App\ResourceType;
+use App\ObjectKind;
 
 $cluster = getCluster();
-$resourceType = ResourceType::STATEFUL_SET;
+$resourceType = ObjectKind::STATEFUL_SET;
 $namespace = $_GET['namespace'] ?? die('No namespace specified');
 $statefulSet = $_GET[$resourceType->smallTitle()] ?? die("No {$resourceType->smallTitle()} specified");
 $statefulSetDescription = $cluster->describe($resourceType, $namespace, $statefulSet);

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\ResourceType;
+use App\ObjectKind;
 
 class Kubernetes
 {
@@ -37,7 +37,7 @@ class Kubernetes
         );
     }
 
-    public function describe(ResourceType $resourceType, string $namespace, string $resourceName): string
+    public function describe(ObjectKind $resourceType, string $namespace, string $resourceName): string
     {
         $command = "kubectl describe {$resourceType->smallTitle()}";
         $command .= ' -n ' . \escapeshellarg($namespace);

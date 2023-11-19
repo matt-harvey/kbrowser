@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] ?? null;
@@ -54,7 +55,7 @@ if ($namespace === null) {
                         <?php endif; ?>
 
                         <td>
-                            <a href="<?= daemonSetUrl($daemonSet['daemonset'], $daemonSet['namespace']) ?>">
+                            <a href="<?= namespacedResourceUrl(ObjectKind::DAEMON_SET, $daemonSet['daemonset'], $daemonSet['namespace']) ?>">
                                 <?= h($daemonSet['daemonset']) ?>
                             </a>
 

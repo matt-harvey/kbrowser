@@ -54,7 +54,7 @@ if ($namespace === null) {
                 <?php endif; ?>
 
                 <td>
-                    <a href="<?= podUrl($pod['pod'], $pod['namespace']) ?>">
+                    <a href="<?= namespacedResourceUrl(ObjectKind::POD, $pod['pod'], $pod['namespace']) ?>">
                         <?= h($pod['pod']) ?>
                     </a>
 

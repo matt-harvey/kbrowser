@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 require PROJECT_ROOT . '/vendor/autoload.php';
 
-use App\ResourceType;
+use App\ObjectKind;
 use App\Service\Kubernetes;
 
 // bootstrapping
@@ -57,7 +57,7 @@ function simplifiedStatefulSetName(string $fullStatefulSetName): string
     return \preg_replace('/^.+\//', '', $fullStatefulSetName);
 }
 
-function resourcesUrl(ResourceType $resourceType, ?string $namespace = null): string
+function resourcesUrl(ObjectKind $resourceType, ?string $namespace = null): string
 {
     $url = '/' . urlencode($resourceType->pluralSmallTitle());
     if ($namespace !== null) {
@@ -71,31 +71,11 @@ function namespaceUrl(string $namespace): string
     return '/namespace?' . \http_build_query(['namespace' => $namespace]);
 }
 
-function podUrl(string $pod, string $namespace): string
-{
-    return namespacedResourceUrl(ResourceType::POD, $pod, $namespace);
-}
-
-function deploymentUrl(string $deployment, string $namespace): string
-{
-    return namespacedResourceUrl(ResourceType::DEPLOYMENT, $deployment, $namespace);
-}
-
-function daemonSetUrl(string $daemonSet, string $namespace): string
-{
-    return namespacedResourceUrl(ResourceType::DAEMON_SET, $daemonSet, $namespace);
-}
-
-function statefulSetUrl(string $statefulSet, string $namespace): string
-{
-    return namespacedResourceUrl(ResourceType::STATEFUL_SET, $statefulSet, $namespace);
-}
-
-function namespacedResourceUrl(ResourceType $resourceType, string $resourceName, string $namespace): string
+function namespacedResourceUrl(ObjectKind $resourceType, string $resourceName, string $namespace): string
 {
     $resourceTypeSmallTitle = $resourceType->smallTitle();
     $query = \http_build_query([
-        ResourceType::NAMESPACE->smallTitle() => $namespace,
+        ObjectKind::NAMESPACE->smallTitle() => $namespace,
         $resourceTypeSmallTitle => $resourceName,
     ]);
     return "/$resourceTypeSmallTitle?$query";

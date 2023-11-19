@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
-use App\ResourceType;
+use App\ObjectKind;
 
 $cluster = getCluster();
 $namespace = $_GET['namespace'] or die('No namespace specified');
 $deployment = $_GET['deployment'] or die('No deployment specified');
-$deploymentDescription = $cluster->describe(ResourceType::DEPLOYMENT, $namespace, $deployment);
+$deploymentDescription = $cluster->describe(ObjectKind::DEPLOYMENT, $namespace, $deployment);
 
 $title = $deployment;
 $breadcrumbs = [
