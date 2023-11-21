@@ -36,7 +36,7 @@ if ($namespace === null) {
 <div>
     <table>
         <br>
-        <?php if ($namespace === null): ?>
+        <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
             <thead>
             <tr>
                 <td><b>Namespace</b></td>
@@ -48,7 +48,7 @@ if ($namespace === null) {
         <tbody>
         <?php foreach ($objects as $object): ?>
             <tr>
-                <?php if ($namespace === null): ?>
+                <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
                     <td>
                         <a href="<?= namespaceUrl($object['namespace']) ?>">
                             <?= h($object['namespace']) ?>
@@ -57,10 +57,15 @@ if ($namespace === null) {
                 <?php endif; ?>
 
                 <td>
-                    <a href="<?= namespacedResourceUrl($objectKind, $object[$objectKind->smallTitle()], $object['namespace']) ?>">
-                        <?= h($object[$objectKind->smallTitle()]) ?>
-                    </a>
-
+                    <?php if ($objectKind->isNamespaced()): ?>
+                        <a href="<?= namespacedResourceUrl($objectKind, $object[$objectKind->smallTitle()], $object['namespace']) ?>">
+                            <?= h($object[$objectKind->smallTitle()]) ?>
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= nonNamespacedResourceUrl($objectKind, $object[$objectKind->smallTitle()]) ?>">
+                            <?= h($object[$objectKind->smallTitle()]) ?>
+                        </a>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -61,6 +61,15 @@ function namespaceUrl(string $namespace): string
     return '/namespace?' . \http_build_query(['namespace' => $namespace]);
 }
 
+function nonNamespacedResourceUrl(ObjectKind $resourceType, string $resourceName): string
+{
+    $query = [
+        'kind' => $resourceType->title(),
+        'object' => $resourceName,
+    ];
+    return '/nns-resource?' . \http_build_query($query);
+}
+
 function namespacedResourceUrl(ObjectKind $resourceType, string $resourceName, string $namespace): string
 {
     $query = [

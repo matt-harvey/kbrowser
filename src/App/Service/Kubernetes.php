@@ -26,11 +26,13 @@ class Kubernetes
         );
     }
 
-    public function describe(ObjectKind $kind, string $namespace, string $resourceName): string
+    public function describe(ObjectKind $kind, ?string $namespace, string $resourceName): string
     {
         $kind = \escapeshellarg($kind->smallTitle());
         $command = "kubectl describe $kind";
-        $command .= ' -n ' . \escapeshellarg($namespace);
+        if ($namespace !== null) {
+            $command .= ' -n ' . \escapeshellarg($namespace);
+        }
         $command .= ' ' . \escapeshellarg($resourceName);
         $output = $this->runConsoleCommand($command);
         return \implode(PHP_EOL, $output);
@@ -49,12 +51,14 @@ class Kubernetes
     }
 
     /** @return array<string> */
-    public function getObjects(ObjectKind $objectKind, string $namespace): array
+    public function getObjects(ObjectKind $objectKind, ?string $namespace): array
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
         $command = "kubectl get $escapedObjectKindPlural -o name";
-        $escapedNamespace = \escapeshellarg($namespace);
-        $command .= " --namespace=$escapedNamespace";
+        if ($namespace !== null) {
+            $escapedNamespace = \escapeshellarg($namespace);
+            $command .= " --namespace=$escapedNamespace";
+        }
         $output = $this->runConsoleCommand($command);
         return \array_map(simplifiedObjectName(...), $output);
     }

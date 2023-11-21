@@ -7,10 +7,18 @@ enum ObjectKind: string
     case NAMESPACE = 'Namespace';
     case POD = 'Pod';
     case DEPLOYMENT = 'Deployment';
+
+    case REPLICA_SET = 'ReplicaSet';
     case DAEMON_SET = 'DaemonSet';
     case STATEFUL_SET = 'StatefulSet';
     case JOB = 'Job';
     case CRON_JOB = 'CronJob';
+
+    case CONFIG_MAP = 'ConfigMap';
+
+    case SECRET = 'Secret';
+
+    case NODE = 'Node';
 
     public function smallTitle(): string
     {
@@ -35,7 +43,7 @@ enum ObjectKind: string
     public function isNamespaced(): string
     {
         return match ($this) {
-            self::NAMESPACE => false,
+            self::NAMESPACE, self::NODE => false,
             default => true,
         };
     }
