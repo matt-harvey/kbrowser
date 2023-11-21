@@ -4,21 +4,19 @@ namespace App;
 
 enum ObjectKind: string
 {
-    case NAMESPACE = 'Namespace';
-    case POD = 'Pod';
-    case DEPLOYMENT = 'Deployment';
-
-    case REPLICA_SET = 'ReplicaSet';
-    case DAEMON_SET = 'DaemonSet';
-    case STATEFUL_SET = 'StatefulSet';
-    case JOB = 'Job';
-    case CRON_JOB = 'CronJob';
-
     case CONFIG_MAP = 'ConfigMap';
-
-    case SECRET = 'Secret';
-
+    case CRON_JOB = 'CronJob';
+    case DAEMON_SET = 'DaemonSet';
+    case DEPLOYMENT = 'Deployment';
+    case INGRESS = 'Ingress';
+    case JOB = 'Job';
+    case NAMESPACE = 'Namespace';
     case NODE = 'Node';
+    case POD = 'Pod';
+    case STATEFUL_SET = 'StatefulSet';
+    case REPLICA_SET = 'ReplicaSet';
+    case SECRET = 'Secret';
+    case SERVICE = 'Service';
 
     public function smallTitle(): string
     {
@@ -32,11 +30,17 @@ enum ObjectKind: string
 
     public function pluralSmallTitle(): string
     {
+        if ($this === self::INGRESS) {
+            return 'ingresses';
+        }
         return $this->smallTitle() . 's';
     }
 
     public function pluralTitle(): string
     {
+        if ($this === self::INGRESS) {
+            return 'Ingresses';
+        }
         return $this->title() . 's';
     }
 
