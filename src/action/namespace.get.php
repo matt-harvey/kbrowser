@@ -12,7 +12,7 @@ $namespaceDescription = $cluster->describe(ObjectKind::NAMESPACE, null, $namespa
 $title = 'Namespaces';
 $breadcrumbs = [
     [$cluster->getShortClusterName() => '/'],
-    ['namespaces' => resourcesUrl(ObjectKind::NAMESPACE)],
+    ['namespaces' => namespacesUrl()],
     [$namespace => null],
 ];
 
