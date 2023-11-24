@@ -5,6 +5,7 @@ declare(strict_types=1);
 \define('SRC_ROOT', __DIR__);
 \define('PROJECT_ROOT', \dirname(SRC_ROOT));
 \define('ACTION_ROOT', SRC_ROOT . '/action');
+\define('HOME_CHAR', \json_decode('"\u2302"'));
 
 require PROJECT_ROOT . '/vendor/autoload.php';
 
@@ -32,47 +33,66 @@ function h(mixed $s): string
     return \htmlspecialchars($s);
 }
 
-function getCluster(): Kubernetes
+function getKubernetes(): Kubernetes
 {
     return new Kubernetes();
 }
 
 function simplifiedObjectName(string $fullObjectName): string
 {
-    return \preg_replace('/^.+\//', '', $fullObjectName);
+    return \preg_replace('|^.+/|', '', $fullObjectName);
 }
 
-function resourcesUrl(ObjectKind $kind, ?string $namespace = null): string
+function simplifiedContextName(string $fullName): string
 {
-    $query = ['kind' => $kind->title()];
+    return \preg_replace('|^.+/|', '', $fullName);
+}
+
+function contextUrl(string $context): string
+{
+    return '/context?' . \http_build_query(['context' => $context]);
+}
+
+function resourcesUrl(
+    string $context,
+    ObjectKind $kind,
+    ?string $namespace = null,
+): string
+{
+    $query = ['context' => $context, 'kind' => $kind->title()];
     if ($namespace !== null) {
         $query['namespace'] = $namespace;
     }
     return '/resources?' . \http_build_query($query);
 }
 
-function namespacesUrl(): string
+function namespacesUrl($context): string
 {
-    return '/namespaces';
+    return '/namespaces?' . \http_build_query(['context' => $context]);
 }
 
-function namespaceUrl(string $namespace): string
+function namespaceUrl(string $context, string $namespace): string
 {
-    return '/namespace?' . \http_build_query(['namespace' => $namespace]);
+    return '/namespace?' . \http_build_query([
+        'context' => $context,
+        'namespace' => $namespace,
+    ]);
 }
 
-function nonNamespacedResourceUrl(ObjectKind $resourceType, string $resourceName): string
+function nonNamespacedResourceUrl(string $context, ObjectKind $resourceType, string $resourceName): string
 {
     $query = [
+        'context' => $context,
         'kind' => $resourceType->title(),
         'object' => $resourceName,
     ];
     return '/nns-resource?' . \http_build_query($query);
 }
 
-function namespacedResourceUrl(ObjectKind $resourceType, string $resourceName, string $namespace): string
+function namespacedResourceUrl(string $context, ObjectKind $resourceType, string $resourceName, string $namespace): string
 {
     $query = [
+        'context' => $context,
         'namespace' => $namespace,
         'kind' => $resourceType->title(),
         'object' => $resourceName,
@@ -80,3 +100,7 @@ function namespacedResourceUrl(ObjectKind $resourceType, string $resourceName, s
     return '/resource?' . \http_build_query($query);
 }
 
+function rootUrl(): string
+{
+    return '/';
+}

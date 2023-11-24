@@ -7,12 +7,14 @@ class DefaultLayout
     /** @param array<array<string, string|null>> $breadcrumbs */
     public static function open(string $title, array $breadcrumbs = []): void
     {
+        header("content-type: text/html; charset=UTF-8");
+
         ?>
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <title><?= h($title) ?></title>
-            <meta charset="utf8">
+            <meta charset="UTF-8">
             <style>
                 * {
                     font-family: monospace;

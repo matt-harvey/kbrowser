@@ -5,7 +5,8 @@ declare(strict_types=1);
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 
-$cluster = getCluster();
+$kubernetes = getKubernetes();
+$context = $_GET['context'] ?? die('No context specified');
 $namespace = $_GET['namespace'] ?? null;
 $objectKind = $_GET['kind'] ?? die('No object kind specified');
 $objectKind = ObjectKind::from($objectKind);
@@ -13,20 +14,22 @@ $objectKind = ObjectKind::from($objectKind);
 $title = $objectKind->pluralTitle();
 
 if ($namespace === null) {
-    $objects = $cluster->getObjectsWithNamespaces($objectKind);
+    $objects = $kubernetes->getObjectsWithNamespaces($context, $objectKind);
     $breadcrumbs = [
-        [$cluster->getShortClusterName() => '/'],
+        [HOME_CHAR => rootUrl()],
+        [simplifiedContextName($context) => contextUrl($context)],
         [$objectKind->pluralSmallTitle() => null],
     ];
 } else {
     $objects = \array_map(
         fn ($obj) => [$objectKind->smallTitle() => $obj, 'namespace' => $namespace],
-        $cluster->getObjects($objectKind, $namespace),
+        $kubernetes->getObjects($context, $objectKind, $namespace),
     );
     $breadcrumbs = [
-        [$cluster->getShortClusterName() => '/'],
-        ['namespaces' => '/namespaces'],
-        [$namespace => namespaceUrl($namespace)],
+        [HOME_CHAR => rootUrl()],
+        [simplifiedContextName($context) => contextUrl($context)],
+        ['namespaces' => namespacesUrl($context)],
+        [$namespace => namespaceUrl($context, $namespace)],
         [$objectKind->pluralSmallTitle() => null],
     ];
 }
@@ -50,7 +53,7 @@ if ($namespace === null) {
             <tr>
                 <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
                     <td>
-                        <a href="<?= namespaceUrl($object['namespace']) ?>">
+                        <a href="<?= namespaceUrl($context, $object['namespace']) ?>">
                             <?= h($object['namespace']) ?>
                         </a>
                     </td>
@@ -58,11 +61,11 @@ if ($namespace === null) {
 
                 <td>
                     <?php if ($objectKind->isNamespaced()): ?>
-                        <a href="<?= namespacedResourceUrl($objectKind, $object[$objectKind->smallTitle()], $object['namespace']) ?>">
+                        <a href="<?= namespacedResourceUrl($context, $objectKind, $object[$objectKind->smallTitle()], $object['namespace']) ?>">
                             <?= h($object[$objectKind->smallTitle()]) ?>
                         </a>
                     <?php else: ?>
-                        <a href="<?= nonNamespacedResourceUrl($objectKind, $object[$objectKind->smallTitle()]) ?>">
+                        <a href="<?= nonNamespacedResourceUrl($context, $objectKind, $object[$objectKind->smallTitle()]) ?>">
                             <?= h($object[$objectKind->smallTitle()]) ?>
                         </a>
                     <?php endif; ?>

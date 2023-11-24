@@ -3,27 +3,20 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
-use App\ObjectKind;
 
-$cluster = getCluster();
+$kubernetes = getKubernetes();
 $title = 'KBrowser';
 $breadcrumbs = [
-    [$cluster->getShortClusterName() => null],
+    [HOME_CHAR => null],
 ];
+$contexts = $kubernetes->getContexts();
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <?php foreach (ObjectKind::cases() as $objectKind): ?>
-
-        <?php
-            [$url, $linkText] = match ($objectKind) {
-                ObjectKind::NAMESPACE => [namespacesUrl(), 'Namespaces'],
-                default => [resourcesUrl($objectKind), $objectKind->pluralTitle()],
-            };
-        ?>
+    <?php foreach ($contexts as $context): ?>
 
         <p>
-            <a href="<?= $url ?>"><?= h($linkText) ?></a>
+            <a href="<?= contextUrl($context) ?>"><?= h($context) ?></a>
         </p>
 
     <?php endforeach; ?>

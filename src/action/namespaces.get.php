@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
 
-$cluster = getCluster();
-$namespaces = $cluster->getNamespaces();
+$kubernetes = getKubernetes();
+$context = $_GET['context'] ?? die('Context not provided');
+$namespaces = $kubernetes->getNamespaces($context);
 
 $title = 'Namespaces';
 $breadcrumbs = [
-    [$cluster->getShortClusterName() => '/'],
+    [HOME_CHAR => rootUrl()],
+    [simplifiedContextName($context) => contextUrl($context)],
     ['namespaces' => null],
 ];
 
@@ -22,7 +24,7 @@ $breadcrumbs = [
                 <?php foreach ($namespaces as $namespace): ?>
                     <tr>
                         <td>
-                            <a href="<?= namespaceUrl($namespace) ?>">
+                            <a href="<?= namespaceUrl($context, $namespace) ?>">
                                 <?= h($namespace) ?>
                             </a>
                         </td>

@@ -5,14 +5,21 @@ declare(strict_types=1);
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 
-$cluster = getCluster();
+$kubernetes = getKubernetes();
+$context = $_GET['context'] or die('Context not specified');
 $namespace = $_GET['namespace'] or die('Namespace not specified');
-$namespaceDescription = $cluster->describe(ObjectKind::NAMESPACE, null, $namespace);
+$namespaceDescription = $kubernetes->describe(
+        $context,
+        ObjectKind::NAMESPACE,
+        null,
+        $namespace,
+);
 
 $title = 'Namespaces';
 $breadcrumbs = [
-    [$cluster->getShortClusterName() => '/'],
-    ['namespaces' => namespacesUrl()],
+    [HOME_CHAR => rootUrl()],
+    [simplifiedContextName($context) => contextUrl($context)],
+    ['namespaces' => namespacesUrl($context)],
     [$namespace => null],
 ];
 
@@ -31,7 +38,8 @@ $breadcrumbs = [
         <?php if ($resourceType->isNamespaced()): ?>
             <p>
                 <?= h($namespace) ?> &rightarrow;
-                <a href="<?= resourcesUrl($resourceType, $namespace) ?>">
+
+                <a href="<?= resourcesUrl($context, $resourceType, $namespace) ?>">
                     <?= h($resourceType->pluralTitle()) ?>
                 </a>
             </p>

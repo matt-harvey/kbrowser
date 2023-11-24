@@ -5,19 +5,21 @@ declare(strict_types=1);
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 
-$cluster = getCluster();
+$kubernetes = getKubernetes();
+$context = $_GET['context'] or die('No context specified');
 $namespace = $_GET['namespace'] or die('No namespace specified');
 $objectKind = $_GET['kind'] or die('No object kind specified');
 $objectKind = ObjectKind::from($objectKind);
 $objectName = $_GET['object'] or die('No object specified');
-$objectDescription = $cluster->describe($objectKind, $namespace, $objectName);
+$objectDescription = $kubernetes->describe($context, $objectKind, $namespace, $objectName);
 
 $title = $objectName;
 $breadcrumbs = [
-    [$cluster->getShortClusterName() => '/'],
-    ['namespaces' => namespacesUrl()],
-    [$namespace => namespaceUrl($namespace)],
-    [$objectKind->pluralSmallTitle() => resourcesUrl($objectKind, $namespace)],
+    [HOME_CHAR => rootUrl()],
+    [simplifiedContextName($context) => contextUrl($context)],
+    ['namespaces' => namespacesUrl($context)],
+    [$namespace => namespaceUrl($context, $namespace)],
+    [$objectKind->pluralSmallTitle() => resourcesUrl($context, $objectKind, $namespace)],
     [$objectName  => null],
 ];
 ?>

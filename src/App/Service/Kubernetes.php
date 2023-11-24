@@ -17,19 +17,42 @@ class Kubernetes
     }
 
     /** @return array<string> */
-    public function getNamespaces(): array
+    public function getContexts(): array
     {
-        $namespaces = $this->runConsoleCommand('kubectl get namespaces -o name');
+        return $this->runConsoleCommand('kubectl config get-contexts -o name');
+    }
+
+    /** @return array<string> */
+    public function getShortContexts(): array
+    {
+        return \array_map(
+            fn ($c) => \preg_replace('|^.+/|', '', $c),
+            $this->getContexts(),
+        );
+    }
+
+    /** @return array<string> */
+    public function getNamespaces(string $context): array
+    {
+        $command = 'kubectl get namespaces -o name';
+        $command .= ' --context=' . \escapeshellarg($context);
+        $namespaces = $this->runConsoleCommand($command);
         return \array_map(
             fn ($ns) => \preg_replace('/^namespace\//', '', $ns),
             $namespaces,
         );
     }
 
-    public function describe(ObjectKind $kind, ?string $namespace, string $resourceName): string
+    public function describe(
+        string $context,
+        ObjectKind $kind,
+        ?string $namespace,
+        string $resourceName,
+    ): string
     {
         $kind = \escapeshellarg($kind->smallTitle());
         $command = "kubectl describe $kind";
+        $command .= ' --context=' . \escapeshellarg($context);
         if ($namespace !== null) {
             $command .= ' -n ' . \escapeshellarg($namespace);
         }
@@ -51,10 +74,11 @@ class Kubernetes
     }
 
     /** @return array<string> */
-    public function getObjects(ObjectKind $objectKind, ?string $namespace): array
+    public function getObjects(string $context, ObjectKind $objectKind, ?string $namespace): array
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
         $command = "kubectl get $escapedObjectKindPlural -o name";
+        $command .= ' --context=' . \escapeshellarg($context);
         if ($namespace !== null) {
             $escapedNamespace = \escapeshellarg($namespace);
             $command .= " --namespace=$escapedNamespace";
@@ -64,13 +88,13 @@ class Kubernetes
     }
 
     /** @return array<array<string, string>> */
-    public function getObjectsWithNamespaces(ObjectKind $objectKind): array
+    public function getObjectsWithNamespaces(string $context, ObjectKind $objectKind): array
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
+        $command = "kubectl get $escapedObjectKindPlural -A -o custom-columns=':metadata.name,:metadata.namespace'";
+        $command .= ' --context=' . \escapeshellarg($context);
 
-        $objects = $this->runConsoleCommand(
-            "kubectl get $escapedObjectKindPlural -A -o custom-columns=':metadata.name,:metadata.namespace'",
-        );
+        $objects = $this->runConsoleCommand($command);
         $result = [];
         foreach ($objects as $line) {
             if (\strlen(\trim($line)) == 0) {
@@ -83,14 +107,5 @@ class Kubernetes
             ];
         }
         return $result;
-    }
-
-    public function getShortClusterName(): string
-    {
-        $names = $this->runConsoleCommand("kubectl config current-context");
-        if (\count($names) != 1) {
-            throw new \Exception('Cannot determine single cluster from config');
-        }
-        return \preg_replace('/^.+\//', '', $names[0]);
     }
 }
