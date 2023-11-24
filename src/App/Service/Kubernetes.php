@@ -87,7 +87,7 @@ class Kubernetes
 
     public function getShortClusterName(): string
     {
-        $names = $this->runConsoleCommand("kubectl config view -o jsonpath='{.clusters[].name}'");
+        $names = $this->runConsoleCommand("kubectl config current-context");
         if (\count($names) != 1) {
             throw new \Exception('Cannot determine single cluster from config');
         }
