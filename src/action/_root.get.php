@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
+use App\Route;
 
 $kubernetes = getKubernetes();
 $title = 'KBrowser';
@@ -16,7 +17,7 @@ $contexts = $kubernetes->getContexts();
     <?php foreach ($contexts as $context): ?>
 
         <p>
-            <a href="<?= contextUrl($context) ?>"><?= h($context) ?></a>
+            <a href="<?= Route::forContext($context) ?>"><?= h($context) ?></a>
         </p>
 
     <?php endforeach; ?>

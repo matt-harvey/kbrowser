@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
+use App\Route;
 
 $kubernetes = getKubernetes();
 $context = $_GET['context'] ?? die('No context specified');
@@ -16,8 +17,8 @@ $title = $objectKind->pluralTitle();
 if ($namespace === null) {
     $objects = $kubernetes->getObjectsWithNamespaces($context, $objectKind);
     $breadcrumbs = [
-        [HOME_CHAR => rootUrl()],
-        [simplifiedContextName($context) => contextUrl($context)],
+        Route::forHome()->toBreadcrumb(),
+        Route::forContext($context)->toBreadcrumb(),
         [$objectKind->pluralSmallTitle() => null],
     ];
 } else {
@@ -26,10 +27,10 @@ if ($namespace === null) {
         $kubernetes->getObjects($context, $objectKind, $namespace),
     );
     $breadcrumbs = [
-        [HOME_CHAR => rootUrl()],
-        [simplifiedContextName($context) => contextUrl($context)],
-        ['namespaces' => namespacesUrl($context)],
-        [$namespace => namespaceUrl($context, $namespace)],
+        Route::forHome()->toBreadcrumb(),
+        Route::forContext($context)->toBreadcrumb(),
+        Route::forNamespaces($context)->toBreadcrumb(),
+        Route::forNamespace($context, $namespace)->toBreadcrumb(),
         [$objectKind->pluralSmallTitle() => null],
     ];
 }
@@ -53,22 +54,31 @@ if ($namespace === null) {
             <tr>
                 <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
                     <td>
-                        <a href="<?= namespaceUrl($context, $object['namespace']) ?>">
+                        <a href="<?= Route::forNamespace($context, $object['namespace']) ?>">
                             <?= h($object['namespace']) ?>
                         </a>
                     </td>
                 <?php endif; ?>
 
                 <td>
-                    <?php if ($objectKind->isNamespaced()): ?>
-                        <a href="<?= namespacedResourceUrl($context, $objectKind, $object[$objectKind->smallTitle()], $object['namespace']) ?>">
-                            <?= h($object[$objectKind->smallTitle()]) ?>
-                        </a>
-                    <?php else: ?>
-                        <a href="<?= nonNamespacedResourceUrl($context, $objectKind, $object[$objectKind->smallTitle()]) ?>">
-                            <?= h($object[$objectKind->smallTitle()]) ?>
-                        </a>
-                    <?php endif; ?>
+                    <?php
+                        if ($objectKind->isNamespaced()) {
+                            $route = Route::forNamespacedResource(
+                                $context,
+                                $objectKind,
+                                $object[$objectKind->smallTitle()],
+                                $object['namespace'],
+                            );
+                        } else {
+                            $route = Route::forNonNamespacedResource(
+                                $context,
+                                $objectKind,
+                                $object[$objectKind->smallTitle()],
+                            );
+                        }
+                    ?>
+
+                    <a href="<?= $route ?>"><?= h($object[$objectKind->smallTitle()]) ?></a>
                 </td>
             </tr>
         <?php endforeach; ?>

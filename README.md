@@ -8,7 +8,12 @@ I made this on a whim for my own use. Don&rsquo;t hold me accountable for it!
 # Prerequisites
 
 * PHP 8.2+
+* `composer`
 * `kubectl` installed locally
+
+# Installation
+
+Clone this repo and run `composer install` from the project root.
 
 # Run it
 

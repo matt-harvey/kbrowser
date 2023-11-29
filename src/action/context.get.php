@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
+use App\Route;
 
 $cluster = getKubernetes();
 $title = 'KBrowser';
 $context = $_GET['context'] ?? die('Context not provided');
 $breadcrumbs = [
-    [HOME_CHAR => rootUrl()],
+    Route::forHome()->toBreadcrumb(),
     [simplifiedContextName($context) => null],
 ];
 ?>
@@ -19,8 +20,8 @@ $breadcrumbs = [
 
         <?php
             [$url, $linkText] = match ($objectKind) {
-                ObjectKind::NAMESPACE => [namespacesUrl($context), 'Namespaces'],
-                default => [resourcesUrl($context, $objectKind), $objectKind->pluralTitle()],
+                ObjectKind::NAMESPACE => [Route::forNamespaces($context)->toUrl(), 'Namespaces'],
+                default => [Route::forResources($context, $objectKind)->toUrl(), $objectKind->pluralTitle()],
             };
         ?>
 

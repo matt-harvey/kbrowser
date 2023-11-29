@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
+use App\Route;
 
 $kubernetes = getKubernetes();
 $context = $_GET['context'] or die('Context not specified');
@@ -17,9 +18,9 @@ $namespaceDescription = $kubernetes->describe(
 
 $title = 'Namespaces';
 $breadcrumbs = [
-    [HOME_CHAR => rootUrl()],
-    [simplifiedContextName($context) => contextUrl($context)],
-    ['namespaces' => namespacesUrl($context)],
+    Route::forHome()->toBreadcrumb(),
+    Route::forContext($context)->toBreadcrumb(),
+    Route::forNamespaces($context)->toBreadcrumb(),
     [$namespace => null],
 ];
 
@@ -39,7 +40,7 @@ $breadcrumbs = [
             <p>
                 <?= h($namespace) ?> &rightarrow;
 
-                <a href="<?= resourcesUrl($context, $resourceType, $namespace) ?>">
+                <a href="<?= Route::forResources($context, $resourceType, $namespace) ?>">
                     <?= h($resourceType->pluralTitle()) ?>
                 </a>
             </p>

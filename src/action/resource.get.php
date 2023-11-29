@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
+use App\Route;
 
 $kubernetes = getKubernetes();
 $context = $_GET['context'] or die('No context specified');
@@ -15,11 +16,11 @@ $objectDescription = $kubernetes->describe($context, $objectKind, $namespace, $o
 
 $title = $objectName;
 $breadcrumbs = [
-    [HOME_CHAR => rootUrl()],
-    [simplifiedContextName($context) => contextUrl($context)],
-    ['namespaces' => namespacesUrl($context)],
-    [$namespace => namespaceUrl($context, $namespace)],
-    [$objectKind->pluralSmallTitle() => resourcesUrl($context, $objectKind, $namespace)],
+    Route::forHome()->toBreadcrumb(),
+    Route::forContext($context)->toBreadcrumb(),
+    Route::forNamespaces($context)->toBreadcrumb(),
+    Route::forNamespace($context, $namespace)->toBreadcrumb(),
+    Route::forResources($context, $objectKind, $namespace)->toBreadcrumb(),
     [$objectName  => null],
 ];
 ?>
