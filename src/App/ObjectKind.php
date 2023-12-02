@@ -8,6 +8,7 @@ enum ObjectKind: string
     case CRON_JOB = 'CronJob';
     case DAEMON_SET = 'DaemonSet';
     case DEPLOYMENT = 'Deployment';
+    case ENDPOINT_SLICE = 'EndpointSlice';
     case INGRESS = 'Ingress';
     case JOB = 'Job';
     case NAMESPACE = 'Namespace';
