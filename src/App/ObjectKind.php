@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 enum ObjectKind: string
@@ -45,11 +47,36 @@ enum ObjectKind: string
         return $this->title() . 's';
     }
 
-    public function isNamespaced(): string
+    public function isNamespaced(): bool
     {
         return match ($this) {
             self::NAMESPACE, self::NODE => false,
             default => true,
         };
+    }
+
+    public function makeTable(bool $includeNamespace): Table
+    {
+        switch ($this) {
+        case self::NAMESPACE:
+        case self::NODE:
+            return Table::create()->add(Column::fromJsonPath('Name', 'metadata.name', 'name'));
+        case self::POD:
+        case self::JOB:
+        case self::CRON_JOB:
+            $table = Table::create();
+            if ($includeNamespace) {
+                $table->add(Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace'));
+            }
+            return $table
+                ->add(Column::fromJsonPath('Name', 'metadata.name', 'name'))
+                ->add(Column::fromJsonPath('Status', 'status.phase', 'status'));
+        default:
+            $table = Table::create();
+            if ($includeNamespace) {
+                $table->add(Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace'));
+            }
+            return $table->add(Column::fromJsonPath('Name', 'metadata.name', 'name'));
+        }
     }
 }

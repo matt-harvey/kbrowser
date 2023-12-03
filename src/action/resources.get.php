@@ -15,17 +15,14 @@ $objectKind = ObjectKind::from($objectKind);
 $title = $objectKind->pluralTitle();
 
 if ($namespace === null) {
-    $objects = $kubernetes->getObjectsWithNamespaces($context, $objectKind);
+    $table = $kubernetes->getObjectsTable($context, $objectKind, true);
     $breadcrumbs = [
         Route::forHome()->toBreadcrumb(),
         Route::forContext($context)->toBreadcrumb(),
         [$objectKind->pluralSmallTitle() => null],
     ];
 } else {
-    $objects = \array_map(
-        fn ($obj) => [$objectKind->smallTitle() => $obj, 'namespace' => $namespace],
-        $kubernetes->getObjects($context, $objectKind, $namespace),
-    );
+    $table = $kubernetes->getObjectsTable($context, $objectKind, false);
     $breadcrumbs = [
         Route::forHome()->toBreadcrumb(),
         Route::forContext($context)->toBreadcrumb(),
@@ -37,52 +34,52 @@ if ($namespace === null) {
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
-<div>
-    <table>
-        <br>
-        <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
+    <div>
+        <table>
             <thead>
-            <tr>
-                <td><b>Namespace</b></td>
-                <td><b><?= h($objectKind->title()) ?></b></td>
-            </tr>
+                <tr>
+                    <?php foreach ($table->getColumns() as $column): ?>
+                        <td><b><?= h($column->getHeader()) ?></b></td>
+                    <?php endforeach; ?>
+                </tr>
             </thead>
-        <?php endif; ?>
 
-        <tbody>
-        <?php foreach ($objects as $object): ?>
-            <tr>
-                <?php if ($namespace === null && $objectKind->isNamespaced()): ?>
-                    <td>
-                        <a href="<?= Route::forNamespace($context, $object['namespace']) ?>">
-                            <?= h($object['namespace']) ?>
-                        </a>
-                    </td>
-                <?php endif; ?>
+            <tbody>
+                <?php foreach ($table as $row): ?>
+                    <tr>
+                        <?php foreach ($table->currentCells() as $cell): ?>
+                            <td>
+                                <?php if ($cell->key === 'namespace'): ?>
+                                    <a href="<?= Route::forNamespace($context, $cell->contents) ?>">
+                                        <?= h($cell->contents) ?>
+                                    </a>
+                                <?php elseif ($cell->key == 'name'): ?>
+                                    <?php
+                                        if ($objectKind->isNamespaced()) {
+                                            $route = Route::forNamespacedResource(
+                                                $context,
+                                                $objectKind,
+                                                $cell->contents,
+                                                $cell->dataSource['metadata']['namespace'],
+                                            );
+                                        } else {
+                                            $route = Route::forNonNamespacedResource(
+                                                $context,
+                                                $objectKind,
+                                                $cell->contents,
+                                            );
+                                        }
+                                    ?>
 
-                <td>
-                    <?php
-                        if ($objectKind->isNamespaced()) {
-                            $route = Route::forNamespacedResource(
-                                $context,
-                                $objectKind,
-                                $object[$objectKind->smallTitle()],
-                                $object['namespace'],
-                            );
-                        } else {
-                            $route = Route::forNonNamespacedResource(
-                                $context,
-                                $objectKind,
-                                $object[$objectKind->smallTitle()],
-                            );
-                        }
-                    ?>
-
-                    <a href="<?= $route ?>"><?= h($object[$objectKind->smallTitle()]) ?></a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+                                    <a href="<?= $route ?>"><?= h($cell->contents) ?></a>
+                                <?php else: ?>
+                                    <?= h($cell->contents) ?>
+                                <?php endif; ?>
+                            </td>
+                        <?php endforeach; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 <?php DefaultLayout::close(); ?>

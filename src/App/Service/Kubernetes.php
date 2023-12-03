@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\ObjectKind;
+use App\Table;
 
 class Kubernetes
 {
@@ -88,24 +89,19 @@ class Kubernetes
     }
 
     /** @return array<array<string, string>> */
-    public function getObjectsWithNamespaces(string $context, ObjectKind $objectKind): array
+    public function getObjectsTable(string $context, ObjectKind $objectKind, bool $includeNamespace): Table
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
-        $command = "kubectl get $escapedObjectKindPlural -A -o custom-columns=':metadata.name,:metadata.namespace'";
+        $command = "kubectl get $escapedObjectKindPlural -A -o json";
         $command .= ' --context=' . \escapeshellarg($context);
 
-        $objects = $this->runConsoleCommand($command);
-        $result = [];
-        foreach ($objects as $line) {
-            if (\strlen(\trim($line)) == 0) {
-                continue;
-            }
-            [$object, $namespace] = \preg_split('/\s+/', $line);
-            $result[] = [
-                $objectKind->smallTitle() => $object,
-                'namespace' => $namespace,
-            ];
-        }
-        return $result;
+        $json = \join('', $this->runConsoleCommand($command));
+        $arr = \json_decode($json, JSON_OBJECT_AS_ARRAY);
+        $items = $arr['items'];
+
+        $table = $objectKind->makeTable($includeNamespace);
+        $table->setSources($items);
+
+        return $table;
     }
 }
