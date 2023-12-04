@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+/**
+ * @implements \Iterator<int, mixed>
+ */
 class Table implements \Iterator
 {
     private int $position = 0;
@@ -44,7 +47,7 @@ class Table implements \Iterator
         return $this;
     }
 
-    /** @param array<mixed> */
+    /** @param array<mixed> $sources */
     public function setSources(array $sources): self
     {
         $this->sources = $sources;

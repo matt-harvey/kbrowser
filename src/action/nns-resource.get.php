@@ -23,7 +23,7 @@ $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
     Route::forResources($context, $objectKind)->toBreadcrumb(),
-    [$objectName  => null],
+    [\strval($objectName)  => null],
 ];
 ?>
 

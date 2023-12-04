@@ -17,5 +17,11 @@
     "require": {
         "php": "^8.2",
         "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10"
+    },
+    "scripts": {
+        "check:stan": "vendor/bin/phpstan analyze -c phpstan.neon"
     }
 }

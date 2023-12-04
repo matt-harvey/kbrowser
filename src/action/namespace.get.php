@@ -21,7 +21,7 @@ $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
     Route::forNamespaces($context)->toBreadcrumb(),
-    [$namespace => null],
+    [\strval($namespace) => null],
 ];
 
 ?>

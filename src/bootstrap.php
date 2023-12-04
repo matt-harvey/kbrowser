@@ -9,16 +9,16 @@ declare(strict_types=1);
 
 require PROJECT_ROOT . '/vendor/autoload.php';
 
-use App\ObjectKind;
 use App\Service\Kubernetes;
 
 // bootstrapping
 
-\set_error_handler(function ($errorCode, $errorString) {
-    echo $errorString;
-    \http_response_code(500);
-    die();
-});
+//FIXME PHPStan errors out on this for some reason
+//\set_error_handler(function ($errorCode, $errorString) {
+//    echo $errorString;
+//    \http_response_code(500);
+//    die();
+//});
 
 \set_exception_handler(function (\Throwable $exception) {
     echo \get_class($exception) . ': ' . $exception->getMessage();

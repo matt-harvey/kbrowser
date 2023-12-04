@@ -88,7 +88,6 @@ class Kubernetes
         return \array_map(simplifiedObjectName(...), $output);
     }
 
-    /** @return array<array<string, string>> */
     public function getObjectsTable(string $context, ObjectKind $objectKind, bool $includeNamespace): Table
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
@@ -96,7 +95,7 @@ class Kubernetes
         $command .= ' --context=' . \escapeshellarg($context);
 
         $json = \join('', $this->runConsoleCommand($command));
-        $arr = \json_decode($json, JSON_OBJECT_AS_ARRAY);
+        $arr = \json_decode(json: $json, associative: true);
         $items = $arr['items'];
 
         $table = $objectKind->makeTable($includeNamespace);

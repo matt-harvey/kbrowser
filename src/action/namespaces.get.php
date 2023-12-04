@@ -11,7 +11,7 @@ $namespaces = $kubernetes->getNamespaces($context);
 
 $title = 'Namespaces';
 $breadcrumbs = [
-    route::forHome()->toBreadcrumb(),
+    Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
     ['namespaces' => null],
 ];

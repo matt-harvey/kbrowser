@@ -95,7 +95,7 @@ class Route
     /** @return array<string, ?string> */
     public function toBreadcrumb(bool $navigable = true): array
     {
-        return [$this->breadcrumbName => ($navigable ? $this->url : null)];
+        return [$this->breadcrumbName => ($navigable ? $this->toUrl() : null)];
     }
 
     public function toUrl(): string
