@@ -35,6 +35,10 @@ if ($namespace === null) {
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
     <div>
+        &nbsp;&nbsp;<?= \count($table) ?> <?= $objectKind->pluralSmallTitle() ?>:
+    </div>
+    <br>
+    <div>
         <table>
             <thead>
                 <tr>

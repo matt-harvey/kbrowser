@@ -7,7 +7,7 @@ namespace App;
 /**
  * @implements \Iterator<int, mixed>
  */
-class Table implements \Iterator
+class Table implements \Iterator, \Countable
 {
     private int $position = 0;
 
@@ -77,5 +77,10 @@ class Table implements \Iterator
     public function next(): void
     {
         $this->position++;
+    }
+
+    public function count(): int
+    {
+        return \count($this->sources);
     }
 }
