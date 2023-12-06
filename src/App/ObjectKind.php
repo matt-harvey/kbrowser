@@ -59,7 +59,7 @@ enum ObjectKind: string
 
     public function makeTable(bool $includeNamespace): Table
     {
-        $nameColumn = Column::fromJsonPath('Name', 'metadata.name', 'name');
+        $nameColumn = Column::fromJsonPath($this->title(), 'metadata.name', 'name');
         $namespaceColumn = Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace');
         $statusColumn = Column::fromJsonPath('Status', 'status.phase', 'status');
         $createdColumn = new Column('Created', 'created', function (mixed $dataSource): string {
