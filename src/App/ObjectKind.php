@@ -59,8 +59,33 @@ enum ObjectKind: string
 
     public function makeTable(bool $includeNamespace): Table
     {
-        $nameColumn = Column::fromJsonPath($this->title(), 'metadata.name', 'name');
-        $namespaceColumn = Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace');
+        $nameColumn = Column::fromJsonPath(
+            $this->title(),
+            'metadata.name',
+            'name',
+            function (string $context, mixed $dataSource): string {
+                $name = $dataSource['metadata']['name'];
+                if ($this == self::NAMESPACE) {
+                    return Route::forNamespace($context, $name)->toUrl();
+                }
+                if ($this->isNamespaced()) {
+                    $namespace = $dataSource['metadata']['namespace'];
+                    return Route::forNamespacedResource($context, $this, $name, $namespace)->toUrl();
+                }
+                return Route::forNonNamespacedResource($context, $this, $name)->toUrl();
+            },
+        );
+
+        $namespaceColumn = Column::fromJsonPath(
+            'Namespace',
+            'metadata.namespace',
+            'namespace',
+            function (string $context, mixed $dataSource): string {
+                $namespace = $dataSource['metadata']['namespace'];
+                return Route::forNamespace($context, $namespace)->toUrl();
+            },
+        );
+
         $statusColumn = Column::fromJsonPath('Status', 'status.phase', 'status');
         $createdColumn = new Column('Created', 'created', function (mixed $dataSource): string {
             $isoCreatedAt = $dataSource['metadata']['creationTimestamp'];

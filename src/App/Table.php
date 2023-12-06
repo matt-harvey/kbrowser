@@ -35,10 +35,10 @@ class Table implements \Iterator, \Countable
     }
 
     /** @return array<Cell> */
-    public function currentCells(): array
+    public function currentCells(string $context): array
     {
         $current = $this->current();
-        return \array_map(fn (Column $column) => $column->extract($current), $this->columns);
+        return \array_map(fn (Column $column) => $column->extract($context, $current), $this->columns);
     }
 
     public function add(Column $column): self

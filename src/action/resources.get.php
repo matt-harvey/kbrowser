@@ -51,35 +51,12 @@ if ($namespace === null) {
             <tbody>
                 <?php foreach ($table as $row): ?>
                     <tr>
-                        <?php foreach ($table->currentCells() as $cell): ?>
+                        <?php foreach ($table->currentCells($context) as $cell): ?>
                             <td>
-                                <?php if ($cell->key === 'namespace'): ?>
-                                    <a href="<?= Route::forNamespace($context, $cell->contents) ?>">
-                                        <?= h($cell->contents) ?>
-                                    </a>
-                                <?php elseif ($cell->key === 'name'): ?>
-                                    <?php
-                                        if ($objectKind->isNamespaced()) {
-                                            $route = Route::forNamespacedResource(
-                                                $context,
-                                                $objectKind,
-                                                $cell->contents,
-                                                $cell->dataSource['metadata']['namespace'],
-                                            );
-                                        } elseif ($objectKind === ObjectKind::NAMESPACE) {
-                                            $route = Route::forNamespace($context, $cell->contents);
-                                        } else {
-                                            $route = Route::forNonNamespacedResource(
-                                                $context,
-                                                $objectKind,
-                                                $cell->contents,
-                                            );
-                                        }
-                                    ?>
-
-                                    <a href="<?= $route ?>"><?= h($cell->contents) ?></a>
-                                <?php else: ?>
+                                <?php if ($cell->url === null): ?>
                                     <?= h($cell->contents) ?>
+                                <?php else: ?>
+                                    <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
                                 <?php endif; ?>
                             </td>
                         <?php endforeach; ?>

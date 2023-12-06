@@ -11,16 +11,20 @@ namespace App;
  */
 readonly class Column
 {
+    private ?\Closure $urlExtractor;
+
     /**
      * @param string $header
      * @param string $key
-     * @param \Closure $extractor
+     * @param \Closure $contentsExtractor
      */
     public function __construct(
         private string $header,
         private string $key,
-        private \Closure $extractor,
+        private \Closure $contentsExtractor,
+        ?\Closure $urlExtractor = null,
     ) {
+        $this->urlExtractor = ($urlExtractor ?? fn (string $context, mixed $dataSource) => null);
     }
 
     public function getHeader(): string
@@ -33,14 +37,20 @@ readonly class Column
         return $this->key;
     }
 
-    public function extract(mixed $dataSource): Cell
+    public function extract(string $context, mixed $dataSource): Cell
     {
-        $value = ($this->extractor)($dataSource);
+        $contents = ($this->contentsExtractor)($dataSource);
         $key = $this->getKey();
-        return new Cell(contents: $value, key: $key, dataSource: $dataSource);
+        $url = ($this->urlExtractor)($context, $dataSource);
+        return new Cell($contents, $key, $dataSource, $url);
     }
 
-    public static function fromJsonPath(string $header, string $jsonPath, ?string $key = null): self
+    public static function fromJsonPath(
+        string $header,
+        string $jsonPath,
+        ?string $key = null,
+        ?\Closure $urlExtractor = null,
+    ): self
     {
         $jsonKeys = \explode('.', $jsonPath);
         $extractor = function (mixed $dataSource) use ($jsonKeys): string {
@@ -50,6 +60,11 @@ readonly class Column
             }
             return \strval($result);
         };
-        return new self(header: $header, key: ($key ?? $jsonPath), extractor: $extractor);
+        return new self(
+            header: $header,
+            key: ($key ?? $jsonPath),
+            contentsExtractor: $extractor,
+            urlExtractor: $urlExtractor,
+        );
     }
 }

@@ -10,6 +10,7 @@ readonly class Cell
         public string $contents,
         public string $key,
         public mixed $dataSource,
+        public ?string $url,
     ) {
     }
 }
