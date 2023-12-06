@@ -26,9 +26,10 @@ class Route
 
     public static function forNamespaces(string $context): self
     {
-        return new self(
-            '/namespaces?' . \http_build_query(['context' => $context]),
-            'namespaces',
+        return self::forResources(
+            $context,
+            ObjectKind::NAMESPACE,
+            null
         );
     }
 

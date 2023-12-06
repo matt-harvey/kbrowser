@@ -88,17 +88,27 @@ class Kubernetes
         return \array_map(simplifiedObjectName(...), $output);
     }
 
-    public function getObjectsTable(string $context, ObjectKind $objectKind, bool $includeNamespace): Table
+    public function getObjectsTable(
+        string $context,
+        ObjectKind $objectKind,
+        ?string $namespace,
+        bool $includeNamespaceInTable,
+    ): Table
     {
         $escapedObjectKindPlural = \escapeshellarg($objectKind->pluralSmallTitle());
-        $command = "kubectl get $escapedObjectKindPlural -A -o json";
+        $command = "kubectl get $escapedObjectKindPlural -o json";
+        if ($namespace === null) {
+            $command .= ' -A';
+        } else {
+            $command .= ' --namespace=' . \escapeshellarg($namespace);
+        }
         $command .= ' --context=' . \escapeshellarg($context);
 
         $json = \join('', $this->runConsoleCommand($command));
         $arr = \json_decode(json: $json, associative: true);
         $items = $arr['items'];
 
-        $table = $objectKind->makeTable($includeNamespace);
+        $table = $objectKind->makeTable($includeNamespaceInTable);
         $table->setSources($items);
 
         return $table;

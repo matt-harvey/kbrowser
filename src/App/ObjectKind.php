@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use Carbon\Carbon;
+
 enum ObjectKind: string
 {
     case CONFIG_MAP = 'ConfigMap';
@@ -57,26 +59,38 @@ enum ObjectKind: string
 
     public function makeTable(bool $includeNamespace): Table
     {
-        switch ($this) {
-        case self::NAMESPACE:
-        case self::NODE:
-            return Table::create()->add(Column::fromJsonPath('Name', 'metadata.name', 'name'));
-        case self::POD:
-        case self::JOB:
-        case self::CRON_JOB:
-            $table = Table::create();
-            if ($includeNamespace) {
-                $table->add(Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace'));
-            }
-            return $table
-                ->add(Column::fromJsonPath('Name', 'metadata.name', 'name'))
-                ->add(Column::fromJsonPath('Status', 'status.phase', 'status'));
-        default:
-            $table = Table::create();
-            if ($includeNamespace) {
-                $table->add(Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace'));
-            }
-            return $table->add(Column::fromJsonPath('Name', 'metadata.name', 'name'));
+        $nameColumn = Column::fromJsonPath('Name', 'metadata.name', 'name');
+        $namespaceColumn = Column::fromJsonPath('Namespace', 'metadata.namespace', 'namespace');
+        $statusColumn = Column::fromJsonPath('Status', 'status.phase', 'status');
+        $createdColumn = new Column('Created', 'created', function (mixed $dataSource): string {
+            $isoCreatedAt = $dataSource['metadata']['creationTimestamp'];
+            $createdAt = Carbon::parse($isoCreatedAt);
+            return $createdAt->diffForHumans();
+        });
+
+        $table = Table::create();
+        if ($includeNamespace && $this->isNamespaced()) {
+            $table->add($namespaceColumn);
         }
+
+        return match ($this) {
+            self::NAMESPACE, self::POD =>
+                $table
+                    ->add($nameColumn)
+                    ->add($statusColumn)
+                    ->add($createdColumn),
+            self::CONFIG_MAP, self::SECRET =>
+                $table
+                    ->add($nameColumn)
+                    ->add(new Column('Data', 'data', function (mixed $dataSource): string {
+                        return \strval(\count($dataSource['data'] ?? []));
+                    }))
+                    ->add($createdColumn),
+            default =>
+                $table
+                    ->add($nameColumn)
+                    ->add($createdColumn)
+
+        };
     }
 }

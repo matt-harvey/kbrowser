@@ -15,14 +15,14 @@ $objectKind = ObjectKind::from($objectKind);
 $title = $objectKind->pluralTitle();
 
 if ($namespace === null) {
-    $table = $kubernetes->getObjectsTable($context, $objectKind, true);
+    $table = $kubernetes->getObjectsTable($context, $objectKind, null, $objectKind->isNamespaced());
     $breadcrumbs = [
         Route::forHome()->toBreadcrumb(),
         Route::forContext($context)->toBreadcrumb(),
         [$objectKind->pluralSmallTitle() => null],
     ];
 } else {
-    $table = $kubernetes->getObjectsTable($context, $objectKind, false);
+    $table = $kubernetes->getObjectsTable($context, $objectKind, $namespace, false);
     $breadcrumbs = [
         Route::forHome()->toBreadcrumb(),
         Route::forContext($context)->toBreadcrumb(),
@@ -53,7 +53,7 @@ if ($namespace === null) {
                                     <a href="<?= Route::forNamespace($context, $cell->contents) ?>">
                                         <?= h($cell->contents) ?>
                                     </a>
-                                <?php elseif ($cell->key == 'name'): ?>
+                                <?php elseif ($cell->key === 'name'): ?>
                                     <?php
                                         if ($objectKind->isNamespaced()) {
                                             $route = Route::forNamespacedResource(
@@ -62,6 +62,8 @@ if ($namespace === null) {
                                                 $cell->contents,
                                                 $cell->dataSource['metadata']['namespace'],
                                             );
+                                        } elseif ($objectKind === ObjectKind::NAMESPACE) {
+                                            $route = Route::forNamespace($context, $cell->contents);
                                         } else {
                                             $route = Route::forNonNamespacedResource(
                                                 $context,
