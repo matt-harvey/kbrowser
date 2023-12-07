@@ -104,6 +104,24 @@ enum ObjectKind: string
                     ->add($nameColumn)
                     ->add($statusColumn)
                     ->add($createdColumn),
+            self::INGRESS =>
+                $table
+                    ->add($nameColumn)
+                    ->add(Column::fromJsonPath('Class', 'spec.ingressClassName', 'class'))
+                    ->add(
+                        new Column('Hosts', 'hosts', function (mixed $dataSource): string {
+                            $rules = $dataSource['spec']['rules'] ?? [];
+                            $hosts = \array_map(fn (mixed $rule) => $rule['host'], $rules);
+                            return \implode(', ', $hosts);
+                        }, function(string $context, mixed $dataSource): ?string {
+                            $rules = $dataSource['spec']['rules'] ?? [];
+                            if (\count($rules) == 1) {
+                                return $rules[0]['host'] ?? null;
+                            }
+                            return null;
+                        }),
+                    )
+                    ->add($createdColumn),
             self::CONFIG_MAP, self::SECRET =>
                 $table
                     ->add($nameColumn)
