@@ -122,6 +122,50 @@ enum ObjectKind: string
                         }),
                     )
                     ->add($createdColumn),
+            self::REPLICA_SET =>
+                    $table
+                        ->add($nameColumn)
+                        ->add(Column::fromJsonPath(
+                            'Observed generation',
+                            'status.observedGeneration',
+                            'observedGeneration',
+                        ))
+                        ->add(Column::fromJsonPath(
+                            'Replicas',
+                            'status.replicas',
+                            'replicas',
+                        ))
+                        ->add(
+                            new Column('Deployment', 'deployment', function (mixed $dataSource): string {
+                                $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
+                                $deployments = [];
+                                foreach ($ownerReferences as $ownerReference) {
+                                    if ($ownerReference['kind'] == 'Deployment') {
+                                        $deployments[] = $ownerReference['name'];
+                                    }
+                                }
+                                return \implode(', ', $deployments);
+                            }, function(string $context, mixed $dataSource): ?string {
+                                $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
+                                $deployments = [];
+                                foreach ($ownerReferences as $ownerReference) {
+                                    if ($ownerReference['kind'] == 'Deployment') {
+                                        $deployments[] = $ownerReference['name'];
+                                    }
+                                }
+                                if (\count($deployments) != 1) {
+                                    return null;
+                                }
+                                return Route::forNamespacedResource(
+                                    $context,
+                                    ObjectKind::DEPLOYMENT,
+                                    $deployments[0],
+                                    $dataSource['metadata']['namespace'],
+                                )->toUrl();
+                            })
+                        )
+                        ->add($createdColumn),
+
             self::CONFIG_MAP, self::SECRET =>
                 $table
                     ->add($nameColumn)
