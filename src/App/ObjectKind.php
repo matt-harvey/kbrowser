@@ -116,7 +116,10 @@ enum ObjectKind: string
                         }, function(string $context, mixed $dataSource): ?string {
                             $rules = $dataSource['spec']['rules'] ?? [];
                             if (\count($rules) == 1) {
-                                return $rules[0]['host'] ?? null;
+                                $host = $rules[0]['host'] ?? null;
+                                if ($host) {
+                                    return "https://$host";
+                                }
                             }
                             return null;
                         }),
