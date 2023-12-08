@@ -78,7 +78,14 @@ enum ObjectKind: string
             },
         );
 
-        $ownedByColumn = new Column('Owned by', 'controlledBy', function (mixed $dataSource): string {
+
+        $ownerKindColumn = new Column('Owner kind', 'ownerKind', function (mixed $dataSource): string {
+            $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
+            $ownerKinds = \array_map(fn ($arr) => $arr['kind'] ?? '- ', $ownerReferences);
+            return \implode(', ', $ownerKinds);
+        });
+
+        $ownedByColumn = new Column('Owned by', 'ownedBy', function (mixed $dataSource): string {
             $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
             $owners = \array_map(fn ($arr) => $arr['name'], $ownerReferences);
             return \implode(', ', $owners);
@@ -131,6 +138,7 @@ enum ObjectKind: string
                 $table
                     ->add($nameColumn)
                     ->add($statusColumn)
+                    ->add($ownerKindColumn)
                     ->add($ownedByColumn)
                     ->add($createdColumn),
             self::PERSISTENT_VOLUME =>
@@ -173,6 +181,7 @@ enum ObjectKind: string
                         'status.replicas',
                         'replicas',
                     ))
+                    ->add($ownerKindColumn)
                     ->add($ownedByColumn)
                     ->add($createdColumn),
 
