@@ -17,6 +17,8 @@ enum ObjectKind: string
     case JOB = 'Job';
     case NAMESPACE = 'Namespace';
     case NODE = 'Node';
+    case PERSISTENT_VOLUME = 'PersistentVolume';
+    case PERSISTENT_VOLUME_CLAIM = 'PersistentVolumeClaim';
     case POD = 'Pod';
     case STATEFUL_SET = 'StatefulSet';
     case REPLICA_SET = 'ReplicaSet';
@@ -52,7 +54,7 @@ enum ObjectKind: string
     public function isNamespaced(): bool
     {
         return match ($this) {
-            self::NAMESPACE, self::NODE => false,
+            self::NAMESPACE, self::NODE, self::PERSISTENT_VOLUME => false,
             default => true,
         };
     }
@@ -102,6 +104,12 @@ enum ObjectKind: string
             self::NAMESPACE, self::POD =>
                 $table
                     ->add($nameColumn)
+                    ->add($statusColumn)
+                    ->add($createdColumn),
+            self::PERSISTENT_VOLUME =>
+                $table
+                    ->add($nameColumn)
+                    ->add(Column::fromJsonPath('Capacity', 'spec.capacity.storage', 'capacity'))
                     ->add($statusColumn)
                     ->add($createdColumn),
             self::INGRESS =>
@@ -175,6 +183,20 @@ enum ObjectKind: string
                     ->add(new Column('Data', 'data', function (mixed $dataSource): string {
                         return \strval(\count($dataSource['data'] ?? []));
                     }))
+                    ->add($createdColumn),
+            self::PERSISTENT_VOLUME_CLAIM =>
+                $table
+                    ->add($nameColumn)
+                    ->add(new Column('Volume', 'volume', function (mixed $dataSource): string {
+                        return $dataSource['spec']['volumeName'];
+                    }, function(string $context, mixed $dataSource): ?string {
+                        return Route::forNonNamespacedResource(
+                            $context,
+                            ObjectKind::PERSISTENT_VOLUME,
+                            $dataSource['spec']['volumeName'],
+                        )->toUrl();
+                    }))
+                    ->add($statusColumn)
                     ->add($createdColumn),
             default =>
                 $table
