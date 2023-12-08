@@ -78,6 +78,27 @@ enum ObjectKind: string
             },
         );
 
+        $ownedByColumn = new Column('Owned by', 'controlledBy', function (mixed $dataSource): string {
+            $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
+            $owners = \array_map(fn ($arr) => $arr['name'], $ownerReferences);
+            return \implode(', ', $owners);
+        }, function (string $context, mixed $dataSource): ?string {
+            $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
+            if (\count($ownerReferences) != 1) {
+                return null;
+            }
+            $owner = $ownerReferences[0];
+            $ownerKind = ObjectKind::tryFrom($owner['kind'] ?? null);
+            if ($ownerKind === null) {
+                return null;
+            }
+            if ($ownerKind->isNamespaced()) {
+                $namespace = $dataSource['metadata']['namespace'];
+                return Route::forNamespacedResource($context, $ownerKind, $owner['name'], $namespace)->toUrl();
+            }
+            return Route::forNonNamespacedResource($context, $ownerKind, $owner['name'])->toUrl();
+        });
+
         $namespaceColumn = Column::fromJsonPath(
             'Namespace',
             'metadata.namespace',
@@ -101,10 +122,16 @@ enum ObjectKind: string
         }
 
         return match ($this) {
-            self::NAMESPACE, self::POD =>
+            self::NAMESPACE =>
                 $table
                     ->add($nameColumn)
                     ->add($statusColumn)
+                    ->add($createdColumn),
+            self::POD =>
+                $table
+                    ->add($nameColumn)
+                    ->add($statusColumn)
+                    ->add($ownedByColumn)
                     ->add($createdColumn),
             self::PERSISTENT_VOLUME =>
                 $table
@@ -134,48 +161,20 @@ enum ObjectKind: string
                     )
                     ->add($createdColumn),
             self::REPLICA_SET =>
-                    $table
-                        ->add($nameColumn)
-                        ->add(Column::fromJsonPath(
-                            'Observed generation',
-                            'status.observedGeneration',
-                            'observedGeneration',
-                        ))
-                        ->add(Column::fromJsonPath(
-                            'Replicas',
-                            'status.replicas',
-                            'replicas',
-                        ))
-                        ->add(
-                            new Column('Deployment', 'deployment', function (mixed $dataSource): string {
-                                $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
-                                $deployments = [];
-                                foreach ($ownerReferences as $ownerReference) {
-                                    if ($ownerReference['kind'] == 'Deployment') {
-                                        $deployments[] = $ownerReference['name'];
-                                    }
-                                }
-                                return \implode(', ', $deployments);
-                            }, function(string $context, mixed $dataSource): ?string {
-                                $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
-                                $deployments = [];
-                                foreach ($ownerReferences as $ownerReference) {
-                                    if ($ownerReference['kind'] == 'Deployment') {
-                                        $deployments[] = $ownerReference['name'];
-                                    }
-                                }
-                                if (\count($deployments) != 1) {
-                                    return null;
-                                }
-                                return Route::forNamespacedResource(
-                                    $context,
-                                    ObjectKind::DEPLOYMENT,
-                                    $deployments[0],
-                                    $dataSource['metadata']['namespace'],
-                                )->toUrl();
-                            })
-                        )
-                        ->add($createdColumn),
+                $table
+                    ->add($nameColumn)
+                    ->add(Column::fromJsonPath(
+                        'Observed generation',
+                        'status.observedGeneration',
+                        'observedGeneration',
+                    ))
+                    ->add(Column::fromJsonPath(
+                        'Replicas',
+                        'status.replicas',
+                        'replicas',
+                    ))
+                    ->add($ownedByColumn)
+                    ->add($createdColumn),
 
             self::CONFIG_MAP, self::SECRET =>
                 $table
