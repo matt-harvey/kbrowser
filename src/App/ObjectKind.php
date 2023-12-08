@@ -206,7 +206,7 @@ enum ObjectKind: string
                     }))
                     ->add($statusColumn)
                     ->add($createdColumn),
-            self::ENDPOINT_SLICE =>
+            self::ENDPOINT_SLICE, self::JOB =>
                 $table
                     ->add($nameColumn)
                     ->add($ownerKindColumn)
