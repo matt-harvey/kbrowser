@@ -206,6 +206,12 @@ enum ObjectKind: string
                     }))
                     ->add($statusColumn)
                     ->add($createdColumn),
+            self::ENDPOINT_SLICE =>
+                $table
+                    ->add($nameColumn)
+                    ->add($ownerKindColumn)
+                    ->add($ownedByColumn)
+                    ->add($createdColumn),
             default =>
                 $table
                     ->add($nameColumn)
