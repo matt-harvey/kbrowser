@@ -15,6 +15,7 @@ class DefaultLayout
         <head>
             <title><?= h($title) ?></title>
             <meta charset="UTF-8">
+            <link rel="icon" href="data:,">
             <style>
                 * {
                     color: #222;
@@ -44,6 +45,7 @@ class DefaultLayout
                     color: black;
                 }
             </style>
+
         </head>
 
         <body>
