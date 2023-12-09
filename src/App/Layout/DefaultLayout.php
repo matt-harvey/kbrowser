@@ -30,7 +30,7 @@ class DefaultLayout
                     color: green;
                 }
                 table {
-                    border-spacing: 1em 0;
+                    border-spacing: 2em 0.25em;
                 }
             </style>
         </head>
