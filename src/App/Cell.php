@@ -11,6 +11,7 @@ readonly class Cell
         public string $key,
         public mixed $dataSource,
         public ?string $url,
+        public Alignment $alignment = Alignment::LEFT,
     ) {
     }
 }

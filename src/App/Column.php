@@ -23,6 +23,7 @@ readonly class Column
         private string $key,
         private \Closure $contentsExtractor,
         ?\Closure $urlExtractor = null,
+        private Alignment $alignment = Alignment::LEFT,
     ) {
         $this->urlExtractor = ($urlExtractor ?? fn (string $context, mixed $dataSource) => null);
     }
@@ -42,7 +43,7 @@ readonly class Column
         $contents = ($this->contentsExtractor)($dataSource);
         $key = $this->getKey();
         $url = ($this->urlExtractor)($context, $dataSource);
-        return new Cell($contents, $key, $dataSource, $url);
+        return new Cell($contents, $key, $dataSource, $url, $this->alignment);
     }
 
     public static function fromJsonPath(
@@ -50,6 +51,7 @@ readonly class Column
         string $jsonPath,
         ?string $key = null,
         ?\Closure $urlExtractor = null,
+        Alignment $alignment = Alignment::LEFT,
     ): self
     {
         $jsonKeys = \explode('.', $jsonPath);
@@ -65,6 +67,7 @@ readonly class Column
             key: ($key ?? $jsonPath),
             contentsExtractor: $extractor,
             urlExtractor: $urlExtractor,
+            alignment: $alignment,
         );
     }
 }

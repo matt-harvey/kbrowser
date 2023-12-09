@@ -52,7 +52,7 @@ if ($namespace === null) {
                 <?php foreach ($table as $row): ?>
                     <tr>
                         <?php foreach ($table->currentCells($context) as $cell): ?>
-                            <td>
+                            <td style="text-align: <?= $cell->alignment->value ?>; align-content: <?= $cell->alignment->value ?>;">
                                 <?php if ($cell->url === null): ?>
                                     <?= h($cell->contents) ?>
                                 <?php else: ?>

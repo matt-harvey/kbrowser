@@ -77,7 +77,6 @@ enum ObjectKind: string
             },
         );
 
-
         $ownerKindColumn = new Column('Owner kind', 'ownerKind', function (mixed $dataSource): string {
             $ownerReferences = $dataSource['metadata']['ownerReferences'] ?? [];
             $ownerKinds = \array_map(fn ($arr) => $arr['kind'] ?? '- ', $ownerReferences);
@@ -120,7 +119,7 @@ enum ObjectKind: string
             $isoCreatedAt = $dataSource['metadata']['creationTimestamp'];
             $createdAt = Carbon::parse($isoCreatedAt);
             return $createdAt->diffForHumans();
-        });
+        }, null, Alignment::RIGHT);
 
         $table = Table::create();
         if ($includeNamespace && $this->isNamespaced()) {
@@ -154,12 +153,15 @@ enum ObjectKind: string
                                 ObjectKind::STORAGE_CLASS,
                                 $storageClass,
                             )->toUrl();
-                        }
+                        },
+                        Alignment::RIGHT,
                     ))
                     ->add(Column::fromJsonPath(
                         'Capacity',
                         'spec.capacity.storage',
                         'capacity',
+                        null,
+                        Alignment::RIGHT,
                     ))
                     ->add(Column::fromJsonpath('Claim', 'spec.claimRef.name', 'claim', function ($context, $dataSource) {
                         $claimName = $dataSource['spec']['claimRef']['name'];
@@ -201,11 +203,15 @@ enum ObjectKind: string
                         'Observed generation',
                         'status.observedGeneration',
                         'observedGeneration',
+                        null,
+                        Alignment::RIGHT,
                     ))
                     ->add(Column::fromJsonPath(
                         'Replicas',
                         'status.replicas',
                         'replicas',
+                        null,
+                        Alignment::RIGHT,
                     ))
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
@@ -216,7 +222,7 @@ enum ObjectKind: string
                     ->add($nameColumn)
                     ->add(new Column('Data', 'data', function (mixed $dataSource): string {
                         return \strval(\count($dataSource['data'] ?? []));
-                    }))
+                    }, null, Alignment::RIGHT))
                     ->add($createdColumn),
             self::PERSISTENT_VOLUME_CLAIM =>
                 $table
@@ -228,6 +234,16 @@ enum ObjectKind: string
                             $context,
                             ObjectKind::PERSISTENT_VOLUME,
                             $dataSource['spec']['volumeName'],
+                        )->toUrl();
+                    }))
+                    ->add(new Column('StorageClass', 'storageClass', function (mixed $dataSource): string {
+                        return $dataSource['spec']['storageClassName'];
+                    }, function(string $context, mixed $dataSource): ?string {
+                        $storageClass = $dataSource['spec']['storageClassName'];
+                        return Route::forNonNamespacedResource(
+                            $context,
+                            ObjectKind::STORAGE_CLASS,
+                            $storageClass,
                         )->toUrl();
                     }))
                     ->add($statusColumn)
