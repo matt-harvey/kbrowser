@@ -19,11 +19,11 @@ readonly class Column
      * @param \Closure $contentsExtractor
      */
     public function __construct(
-        private string $header,
-        private string $key,
-        private \Closure $contentsExtractor,
-        ?\Closure $urlExtractor = null,
-        private Alignment $alignment = Alignment::LEFT,
+        private string    $header,
+        private string    $key,
+        private \Closure  $contentsExtractor,
+        ?\Closure         $urlExtractor = null,
+        private CellStyle $alignment = CellStyle::LEFT,
     ) {
         $this->urlExtractor = ($urlExtractor ?? fn (string $context, mixed $dataSource) => null);
     }
@@ -47,11 +47,11 @@ readonly class Column
     }
 
     public static function fromJsonPath(
-        string $header,
-        string $jsonPath,
-        ?string $key = null,
+        string    $header,
+        string    $jsonPath,
+        ?string   $key = null,
         ?\Closure $urlExtractor = null,
-        Alignment $alignment = Alignment::LEFT,
+        CellStyle $alignment = CellStyle::LEFT,
     ): self
     {
         $jsonKeys = \explode('.', $jsonPath);

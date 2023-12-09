@@ -119,7 +119,7 @@ enum ObjectKind: string
             $isoCreatedAt = $dataSource['metadata']['creationTimestamp'];
             $createdAt = Carbon::parse($isoCreatedAt);
             return $createdAt->diffForHumans();
-        }, null, Alignment::RIGHT);
+        }, null, CellStyle::RIGHT);
 
         $table = Table::create();
         if ($includeNamespace && $this->isNamespaced()) {
@@ -138,7 +138,12 @@ enum ObjectKind: string
                     ->add($statusColumn)
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
-                    ->add($createdColumn),
+                    ->add($createdColumn)
+                    ->add(new Column('', 'logs', fn () => 'View logs', function (string $context, mixed $dataSource): ?string {
+                        $podName = $dataSource['metadata']['name'];
+                        $namespace = $dataSource['metadata']['namespace'];
+                        return Route::forPodLogs($context, $namespace, $podName)->toUrl();
+                    }, CellStyle::BUTTON)),
             self::PERSISTENT_VOLUME =>
                 $table
                     ->add($nameColumn)
@@ -154,14 +159,14 @@ enum ObjectKind: string
                                 $storageClass,
                             )->toUrl();
                         },
-                        Alignment::RIGHT,
+                        CellStyle::RIGHT,
                     ))
                     ->add(Column::fromJsonPath(
                         'Capacity',
                         'spec.capacity.storage',
                         'capacity',
                         null,
-                        Alignment::RIGHT,
+                        CellStyle::RIGHT,
                     ))
                     ->add(Column::fromJsonpath('Claim', 'spec.claimRef.name', 'claim', function ($context, $dataSource) {
                         $claimName = $dataSource['spec']['claimRef']['name'];
@@ -204,14 +209,14 @@ enum ObjectKind: string
                         'status.observedGeneration',
                         'observedGeneration',
                         null,
-                        Alignment::RIGHT,
+                        CellStyle::RIGHT,
                     ))
                     ->add(Column::fromJsonPath(
                         'Replicas',
                         'status.replicas',
                         'replicas',
                         null,
-                        Alignment::RIGHT,
+                        CellStyle::RIGHT,
                     ))
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
@@ -222,7 +227,7 @@ enum ObjectKind: string
                     ->add($nameColumn)
                     ->add(new Column('Data', 'data', function (mixed $dataSource): string {
                         return \strval(\count($dataSource['data'] ?? []));
-                    }, null, Alignment::RIGHT))
+                    }, null, CellStyle::RIGHT))
                     ->add($createdColumn),
             self::PERSISTENT_VOLUME_CLAIM =>
                 $table

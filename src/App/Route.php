@@ -93,6 +93,19 @@ class Route
         );
     }
 
+    public static function forPodLogs(string $context, string $namespace, string $podName): self
+    {
+        $query = [
+            'context' => $context,
+            'namespace' => $namespace,
+            'pod' => $podName,
+        ];
+        return new self(
+            '/pod-logs?' . \http_build_query($query),
+            simplifiedObjectName($podName),
+        );
+    }
+
     /** @return array<string, ?string> */
     public function toBreadcrumb(bool $navigable = true): array
     {

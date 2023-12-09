@@ -2,8 +2,9 @@
 
 namespace App;
 
-enum Alignment: string
+enum CellStyle: string
 {
     case LEFT = 'left';
     case RIGHT = 'right';
+    case BUTTON = 'button';
 }

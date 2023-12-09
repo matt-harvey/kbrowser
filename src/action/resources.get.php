@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\CellStyle;
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 use App\Route;
@@ -52,13 +53,25 @@ if ($namespace === null) {
                 <?php foreach ($table as $row): ?>
                     <tr>
                         <?php foreach ($table->currentCells($context) as $cell): ?>
-                            <td style="text-align: <?= $cell->alignment->value ?>; align-content: <?= $cell->alignment->value ?>;">
-                                <?php if ($cell->url === null): ?>
-                                    <?= h($cell->contents) ?>
-                                <?php else: ?>
-                                    <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
-                                <?php endif; ?>
-                            </td>
+                            <?php if ($cell->style == CellStyle::BUTTON): ?>
+                                <td>
+                                    <button>
+                                        <?php if ($cell->url === null): ?>
+                                            <?= h($cell->contents) ?>
+                                        <?php else: ?>
+                                            <a style="color:inherit;" href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
+                                        <?php endif; ?>
+                                    </button>
+                                </td>
+                             <?php else: ?>
+                                <td style="text-align: <?= $cell->style->value ?>; align-content: <?= $cell->style->value ?>;">
+                                    <?php if ($cell->url === null): ?>
+                                        <?= h($cell->contents) ?>
+                                    <?php else: ?>
+                                        <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
+                                    <?php endif; ?>
+                                </td>
+                             <?php endif; ?>
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>

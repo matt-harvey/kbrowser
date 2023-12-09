@@ -88,6 +88,17 @@ class Kubernetes
         return \array_map(simplifiedObjectName(...), $output);
     }
 
+    /** @return array<string> newest-first log lines */
+    public function getPodLogs(string $context, string $namespace, string $podName): array
+    {
+        $command = "kubectl logs";
+        $command .= ' --context=' . \escapeshellarg($context);
+        $command .= ' --namespace=' . \escapeshellarg($namespace);
+        $command .= ' ' . \escapeshellarg($podName);
+        $output = $this->runConsoleCommand($command);
+        return \array_reverse($output);
+    }
+
     public function getObjectsTable(
         string $context,
         ObjectKind $objectKind,
