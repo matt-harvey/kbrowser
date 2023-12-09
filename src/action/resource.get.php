@@ -45,10 +45,24 @@ $breadcrumbs = [
 ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
-        <b><?= h("{$objectKind->value}/$objectName") ?></b>
-        <?php if ($ownerUrl !== null): ?>
-            [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
-        <?php endif; ?>
+    <b><?= h("{$objectKind->value}/$objectName") ?></b>
+    <?php if ($ownerUrl !== null): ?>
+        [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
+    <?php endif; ?>
+
+    <?php if ($objectKind === ObjectKind::POD): ?>
+        <div>
+            <br>
+            <button>
+                <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
+                    View logs
+                </a>
+            </button>
+            <br>
+            <br>
+        </div>
+    <?php endif; ?>
+
     <div>
         <pre>
 <?= h($objectDescription) ?>

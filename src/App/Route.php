@@ -93,12 +93,18 @@ class Route
         );
     }
 
-    public static function forPodLogs(string $context, string $namespace, string $podName): self
+    public static function forPodLogs(
+        string $context,
+        string $namespace,
+        string $podName,
+        bool $showNewestFirst = true,
+    ): self
     {
         $query = [
             'context' => $context,
             'namespace' => $namespace,
             'pod' => $podName,
+            'order' => $showNewestFirst ? 'newest-first' : 'oldest-first',
         ];
         return new self(
             '/pod-logs?' . \http_build_query($query),

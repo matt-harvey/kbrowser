@@ -88,15 +88,23 @@ class Kubernetes
         return \array_map(simplifiedObjectName(...), $output);
     }
 
-    /** @return array<string> newest-first log lines */
-    public function getPodLogs(string $context, string $namespace, string $podName): array
+    /** @return array<string> */
+    public function getPodLogs(
+        string $context,
+        string $namespace,
+        string $podName,
+        bool $showNewestFirst = true,
+    ): array
     {
         $command = "kubectl logs";
         $command .= ' --context=' . \escapeshellarg($context);
         $command .= ' --namespace=' . \escapeshellarg($namespace);
         $command .= ' ' . \escapeshellarg($podName);
-        $output = $this->runConsoleCommand($command);
-        return \array_reverse($output);
+        $lines = $this->runConsoleCommand($command);
+        if ($showNewestFirst) {
+            $lines = \array_reverse($lines);
+        }
+        return $lines;
     }
 
     public function getObjectsTable(

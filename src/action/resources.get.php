@@ -59,7 +59,7 @@ if ($namespace === null) {
                                         <?php if ($cell->url === null): ?>
                                             <?= h($cell->contents) ?>
                                         <?php else: ?>
-                                            <a style="color:inherit;" href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
+                                            <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
                                         <?php endif; ?>
                                     </button>
                                 </td>

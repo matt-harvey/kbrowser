@@ -17,6 +17,7 @@ class DefaultLayout
             <meta charset="UTF-8">
             <style>
                 * {
+                    color: #222;
                     font-family: monospace;
                 }
                 body {
@@ -27,10 +28,20 @@ class DefaultLayout
                 }
                 a {
                     text-decoration: none;
-                    color: green;
+                    color: darkcyan;
+                }
+                button {
+                    background-color: lightgoldenrodyellow;
+                    border-color: deepskyblue;
+                }
+                button a {
+                    color: black;
                 }
                 table {
                     border-spacing: 2em 0.25em;
+                }
+                b {
+                    color: black;
                 }
             </style>
         </head>
