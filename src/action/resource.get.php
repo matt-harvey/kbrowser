@@ -27,6 +27,7 @@ try {
 $lines = \explode(PHP_EOL, $objectDescription);
 $ownerUrl = null;
 $ownerName = null;
+$ownerKindStr = null;
 foreach ($lines as $line) {
     if (\preg_match('/^(Controlled By):\s+([^\s]+)$/', $line, $matches)) {
         [$ownerKindStr, $ownerName] = \explode('/', $matches[2]);

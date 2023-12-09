@@ -139,7 +139,7 @@ enum ObjectKind: string
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
                     ->add($createdColumn)
-                    ->add(new Column('', 'logs', fn () => 'View logs', function (string $context, mixed $dataSource): ?string {
+                    ->add(new Column('', 'logs', fn () => 'View logs', function (string $context, mixed $dataSource): string {
                         $podName = $dataSource['metadata']['name'];
                         $namespace = $dataSource['metadata']['namespace'];
                         return Route::forPodLogs($context, $namespace, $podName)->toUrl();
@@ -234,7 +234,7 @@ enum ObjectKind: string
                     ->add($nameColumn)
                     ->add(new Column('Volume', 'volume', function (mixed $dataSource): string {
                         return $dataSource['spec']['volumeName'];
-                    }, function(string $context, mixed $dataSource): ?string {
+                    }, function(string $context, mixed $dataSource): string {
                         return Route::forNonNamespacedResource(
                             $context,
                             ObjectKind::PERSISTENT_VOLUME,
@@ -243,7 +243,7 @@ enum ObjectKind: string
                     }))
                     ->add(new Column('StorageClass', 'storageClass', function (mixed $dataSource): string {
                         return $dataSource['spec']['storageClassName'];
-                    }, function(string $context, mixed $dataSource): ?string {
+                    }, function(string $context, mixed $dataSource): string {
                         $storageClass = $dataSource['spec']['storageClassName'];
                         return Route::forNonNamespacedResource(
                             $context,
