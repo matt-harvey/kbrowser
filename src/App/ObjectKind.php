@@ -24,6 +24,7 @@ enum ObjectKind: string
     case REPLICA_SET = 'ReplicaSet';
     case SECRET = 'Secret';
     case SERVICE = 'Service';
+    case STORAGE_CLASS = 'StorageClass';
 
     public function smallTitle(): string
     {
@@ -37,24 +38,22 @@ enum ObjectKind: string
 
     public function pluralSmallTitle(): string
     {
-        if ($this === self::INGRESS) {
-            return 'ingresses';
-        }
-        return $this->smallTitle() . 's';
+        return \strtolower($this->pluralTitle());
     }
 
     public function pluralTitle(): string
     {
-        if ($this === self::INGRESS) {
-            return 'Ingresses';
-        }
-        return $this->title() . 's';
+        return match ($this) {
+            self::INGRESS => 'Ingresses',
+            self::STORAGE_CLASS => 'StorageClasses',
+            default => $this->title() . 's',
+        };
     }
 
     public function isNamespaced(): bool
     {
         return match ($this) {
-            self::NAMESPACE, self::NODE, self::PERSISTENT_VOLUME => false,
+            self::NAMESPACE, self::NODE, self::PERSISTENT_VOLUME, self::STORAGE_CLASS => false,
             default => true,
         };
     }
@@ -144,7 +143,34 @@ enum ObjectKind: string
             self::PERSISTENT_VOLUME =>
                 $table
                     ->add($nameColumn)
-                    ->add(Column::fromJsonPath('Capacity', 'spec.capacity.storage', 'capacity'))
+                    ->add(Column::fromJsonPath(
+                        'StorageClass',
+                        'spec.storageClassName',
+                        'storageClass',
+                        function ($context, $dataSource) {
+                            $storageClass = $dataSource['spec']['storageClassName'];
+                            return Route::forNonNamespacedResource(
+                                $context,
+                                ObjectKind::STORAGE_CLASS,
+                                $storageClass,
+                            )->toUrl();
+                        }
+                    ))
+                    ->add(Column::fromJsonPath(
+                        'Capacity',
+                        'spec.capacity.storage',
+                        'capacity',
+                    ))
+                    ->add(Column::fromJsonpath('Claim', 'spec.claimRef.name', 'claim', function ($context, $dataSource) {
+                        $claimName = $dataSource['spec']['claimRef']['name'];
+                        $namespace = $dataSource['spec']['claimRef']['namespace'];
+                        return Route::forNamespacedResource(
+                            $context,
+                            ObjectKind::PERSISTENT_VOLUME_CLAIM,
+                            $claimName,
+                            $namespace,
+                        )->toUrl();
+                    }))
                     ->add($statusColumn)
                     ->add($createdColumn),
             self::INGRESS =>
