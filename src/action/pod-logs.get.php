@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Exception\NotFoundException;
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 use App\Route;
@@ -11,11 +12,18 @@ $context = $_GET['context'] or die('No context specified');
 $namespace = $_GET['namespace'] or die('No namespace specified');
 $objectKind = ObjectKind::POD;
 $podName = $_GET['pod'] or die('No pod specified');
+$title = $podName;
 $order = $_GET['order'] ?? 'newest-first';
 $showNewestFirst = ($order === 'newest-first');
-$logs = $kubernetes->getPodLogs($context, $namespace, $podName, $showNewestFirst);
+try {
+    $logs = $kubernetes->getPodLogs($context, $namespace, $podName, $showNewestFirst);
+    $errorMessage = null;
+} catch (NotFoundException) {
+    $logs = [];
+    $errorMessage = 'Pod not found. Perhaps it has been deleted?';
+    \http_response_code(404);
+}
 
-$title = $podName;
 $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
@@ -26,6 +34,13 @@ $breadcrumbs = [
     ['logs' => null],
 ];
 ?>
+
+<?php if ($errorMessage !== null): ?>
+    <?php DefaultLayout::open($title, $breadcrumbs); ?>
+    <p><?= h($errorMessage) ?></p>
+    <?php DefaultLayout::close(); ?>
+    <?php exit; ?>
+<?php endif; ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
     <?php if (\count($logs) == 0): ?>

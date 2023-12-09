@@ -2,16 +2,24 @@
 
 namespace App\Service;
 
+use App\Exception\NotFoundException;
 use App\ObjectKind;
 use App\Table;
 
 class Kubernetes
 {
-    /** @return array<string> the output */
+    /**
+     * @return array<string> the output
+     * @throws \Exception
+     * @throws NotFoundException
+     */
     private function runConsoleCommand(string $command): array
     {
-        \exec($command, $output, $resultCode);
+        \exec("$command 2>&1", $output, $resultCode);
         if ($resultCode != 0) {
+            if (\count($output) != 0 && \str_starts_with($output[0], 'Error from server (NotFound)')) {
+                throw new NotFoundException();
+            }
             throw new \Exception("Error executing command: $command");
         }
         return $output;
@@ -44,6 +52,9 @@ class Kubernetes
         );
     }
 
+    /**
+     * @throws NotFoundException
+     */
     public function describe(
         string $context,
         ObjectKind $kind,
@@ -88,7 +99,10 @@ class Kubernetes
         return \array_map(simplifiedObjectName(...), $output);
     }
 
-    /** @return array<string> */
+    /**
+     * @throws NotFoundException
+     * @return array<string>
+     */
     public function getPodLogs(
         string $context,
         string $namespace,

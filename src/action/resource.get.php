@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Exception\NotFoundException;
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
 use App\Route;
@@ -12,7 +13,16 @@ $namespace = $_GET['namespace'] or die('No namespace specified');
 $objectKind = $_GET['kind'] or die('No object kind specified');
 $objectKind = ObjectKind::from($objectKind);
 $objectName = $_GET['object'] or die('No object specified');
-$objectDescription = $kubernetes->describe($context, $objectKind, $namespace, $objectName);
+$title = $objectName;
+
+try {
+    $objectDescription = $kubernetes->describe($context, $objectKind, $namespace, $objectName);
+    $errorMessage = null;
+} catch (NotFoundException) {
+    $objectDescription = '';
+    $errorMessage = "{$objectKind->title()} not found. Perhaps it has been deleted?";
+    \http_response_code(404);
+}
 
 $lines = \explode(PHP_EOL, $objectDescription);
 $ownerUrl = null;
@@ -33,7 +43,6 @@ foreach ($lines as $line) {
     }
 }
 
-$title = $objectName;
 $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
@@ -43,6 +52,13 @@ $breadcrumbs = [
     [\strval($objectName) => null],
 ];
 ?>
+
+<?php if ($errorMessage !== null): ?>
+    <?php DefaultLayout::open($title, $breadcrumbs); ?>
+        <p><?= h($errorMessage) ?></p>
+    <?php DefaultLayout::close(); ?>
+    <?php exit; ?>
+<?php endif; ?>
 
 <?php DefaultLayout::open($title, $breadcrumbs); ?>
     <b><?= h("{$objectKind->value}/$objectName") ?></b>
