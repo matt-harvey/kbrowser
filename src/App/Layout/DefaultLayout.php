@@ -5,10 +5,21 @@ namespace App\Layout;
 class DefaultLayout
 {
     /** @param array<array<string, string|null>> $breadcrumbs */
-    public static function open(string $title, array $breadcrumbs = []): void
+    public static function use(
+            string $title,
+            array $breadcrumbs = [],
+            int $statusCode = 200,
+            ?string $errorMessage = null,
+    ): self
     {
-        header("content-type: text/html; charset=UTF-8");
+        return new self($title, $breadcrumbs, $statusCode, $errorMessage);
+    }
 
+    /** @param array<array<string, string|null>> $breadcrumbs */
+    private function __construct(string $title, array $breadcrumbs, int $statusCode, ?string $errorMessage)
+    {
+        \header("content-type: text/html; charset=UTF-8");
+        \http_response_code($statusCode);
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -71,10 +82,17 @@ class DefaultLayout
 
         <hr>
 
+        <?php if ($errorMessage !== null): ?>
+            <p>
+                <?= h($errorMessage) ?>
+            </p>
+            <?php exit; ?>
+        <?php endif; ?>
+
         <?php
     }
 
-    public static function close(): void
+    private function __destruct()
     {
         ?>
         </body>

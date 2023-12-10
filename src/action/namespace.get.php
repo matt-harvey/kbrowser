@@ -19,10 +19,11 @@ try {
         $namespace,
     );
     $errorMessage = null;
+    $responseCode = 200;
 } catch (NotFoundException) {
     $namespaceDescription = '';
     $errorMessage = ObjectKind::NAMESPACE->title() . ' not found. Perhaps it has been deleted?';
-    \http_response_code(404);
+    $responseCode = 404;
 }
 
 $breadcrumbs = [
@@ -34,31 +35,24 @@ $breadcrumbs = [
 
 ?>
 
-<?php if ($errorMessage !== null): ?>
-    <?php DefaultLayout::open($title, $breadcrumbs); ?>
-    <p><?= h($errorMessage) ?></p>
-    <?php DefaultLayout::close(); ?>
-    <?php exit; ?>
-<?php endif; ?>
+<?php DefaultLayout::use($title, $breadcrumbs, $responseCode, $errorMessage) ?>
 
-<?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <div>
-        <pre>
+<div>
+    <pre>
 <?= h($namespaceDescription) ?>
-        </pre>
-    </div>
+    </pre>
+</div>
 
-    <hr>
+<hr>
 
-    <?php foreach (ObjectKind::cases() as $resourceType): ?>
-        <?php if ($resourceType->isNamespaced()): ?>
-            <p>
-                <?= h($namespace) ?> &rightarrow;
+<?php foreach (ObjectKind::cases() as $resourceType): ?>
+    <?php if ($resourceType->isNamespaced()): ?>
+        <p>
+            <?= h($namespace) ?> &rightarrow;
 
-                <a href="<?= Route::forResources($context, $resourceType, $namespace) ?>">
-                    <?= h($resourceType->pluralTitle()) ?>
-                </a>
-            </p>
-        <?php endif; ?>
-    <?php endforeach; ?>
-<?php DefaultLayout::close(); ?>
+            <a href="<?= Route::forResources($context, $resourceType, $namespace) ?>">
+                <?= h($resourceType->pluralTitle()) ?>
+            </a>
+        </p>
+    <?php endif; ?>
+<?php endforeach; ?>

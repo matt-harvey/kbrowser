@@ -17,11 +17,12 @@ $title = $objectName;
 
 try {
     $objectDescription = $kubernetes->describe($context, $objectKind, $namespace, $objectName);
+    $responseCode = 200;
     $errorMessage = null;
 } catch (NotFoundException) {
     $objectDescription = '';
+    $responseCode = 404;
     $errorMessage = "{$objectKind->title()} not found. Perhaps it has been deleted?";
-    \http_response_code(404);
 }
 
 $lines = \explode(PHP_EOL, $objectDescription);
@@ -54,35 +55,28 @@ $breadcrumbs = [
 ];
 ?>
 
-<?php if ($errorMessage !== null): ?>
-    <?php DefaultLayout::open($title, $breadcrumbs); ?>
-        <p><?= h($errorMessage) ?></p>
-    <?php DefaultLayout::close(); ?>
-    <?php exit; ?>
+<?php DefaultLayout::use($title, $breadcrumbs, $responseCode, $errorMessage); ?>
+
+<b><?= h("{$objectKind->value}/$objectName") ?></b>
+<?php if ($ownerUrl !== null): ?>
+    [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
 <?php endif; ?>
 
-<?php DefaultLayout::open($title, $breadcrumbs); ?>
-    <b><?= h("{$objectKind->value}/$objectName") ?></b>
-    <?php if ($ownerUrl !== null): ?>
-        [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
-    <?php endif; ?>
-
-    <?php if ($objectKind === ObjectKind::POD): ?>
-        <div>
-            <br>
-            <button>
-                <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
-                    View logs
-                </a>
-            </button>
-            <br>
-            <br>
-        </div>
-    <?php endif; ?>
-
+<?php if ($objectKind === ObjectKind::POD): ?>
     <div>
-        <pre>
-<?= h($objectDescription) ?>
-        </pre>
+        <br>
+        <button>
+            <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
+                View logs
+            </a>
+        </button>
+        <br>
+        <br>
     </div>
-<?php DefaultLayout::close(); ?>
+<?php endif; ?>
+
+<div>
+    <pre>
+<?= h($objectDescription) ?>
+    </pre>
+</div>

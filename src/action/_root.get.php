@@ -13,12 +13,8 @@ $breadcrumbs = [
 $contexts = $kubernetes->getContexts();
 ?>
 
-<?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <?php foreach ($contexts as $context): ?>
+<?php DefaultLayout::use($title, $breadcrumbs) ?>
 
-        <p>
-            <a href="<?= Route::forContext($context) ?>"><?= h($context) ?></a>
-        </p>
-
-    <?php endforeach; ?>
-<?php DefaultLayout::close(); ?>
+<?php foreach ($contexts as $context): ?>
+    <p><a href="<?= Route::forContext($context) ?>"><?= h($context) ?></a></p>
+<?php endforeach; ?>

@@ -34,48 +34,48 @@ if ($namespace === null) {
 }
 ?>
 
-<?php DefaultLayout::open($title, $breadcrumbs); ?>
-    <div>
-        &nbsp;&nbsp;<?= \count($table) ?> <?= $objectKind->pluralSmallTitle() ?>:
-    </div>
-    <br>
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <?php foreach ($table->getColumns() as $column): ?>
-                        <td><b><?= h($column->getHeader()) ?></b></td>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
+<?php DefaultLayout::use($title, $breadcrumbs); ?>
 
-            <tbody>
-                <?php foreach ($table as $row): ?>
-                    <tr>
-                        <?php foreach ($table->currentCells($context) as $cell): ?>
-                            <?php if ($cell->style == CellStyle::BUTTON): ?>
-                                <td>
-                                    <button>
-                                        <?php if ($cell->url === null): ?>
-                                            <?= h($cell->contents) ?>
-                                        <?php else: ?>
-                                            <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
-                                        <?php endif; ?>
-                                    </button>
-                                </td>
-                             <?php else: ?>
-                                <td style="text-align: <?= $cell->style->value ?>; align-content: <?= $cell->style->value ?>;">
+<div>
+    &nbsp;&nbsp;<?= \count($table) ?> <?= $objectKind->pluralSmallTitle() ?>:
+</div>
+<br>
+<div>
+    <table>
+        <thead>
+            <tr>
+                <?php foreach ($table->getColumns() as $column): ?>
+                    <td><b><?= h($column->getHeader()) ?></b></td>
+                <?php endforeach; ?>
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php foreach ($table as $row): ?>
+                <tr>
+                    <?php foreach ($table->currentCells($context) as $cell): ?>
+                        <?php if ($cell->style == CellStyle::BUTTON): ?>
+                            <td>
+                                <button>
                                     <?php if ($cell->url === null): ?>
                                         <?= h($cell->contents) ?>
                                     <?php else: ?>
                                         <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
                                     <?php endif; ?>
-                                </td>
-                             <?php endif; ?>
-                        <?php endforeach; ?>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-<?php DefaultLayout::close(); ?>
+                                </button>
+                            </td>
+                         <?php else: ?>
+                            <td style="text-align: <?= $cell->style->value ?>; align-content: <?= $cell->style->value ?>;">
+                                <?php if ($cell->url === null): ?>
+                                    <?= h($cell->contents) ?>
+                                <?php else: ?>
+                                    <a href="<?= $cell->url ?>"><?= h($cell->contents) ?></a>
+                                <?php endif; ?>
+                            </td>
+                         <?php endif; ?>
+                    <?php endforeach; ?>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

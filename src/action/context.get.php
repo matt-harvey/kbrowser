@@ -15,19 +15,19 @@ $breadcrumbs = [
 ];
 ?>
 
-<?php DefaultLayout::open($title, $breadcrumbs) ?>
-    <?php foreach (ObjectKind::cases() as $objectKind): ?>
+<?php DefaultLayout::use($title, $breadcrumbs) ?>
 
-        <?php
-            [$url, $linkText] = match ($objectKind) {
-                ObjectKind::NAMESPACE => [Route::forNamespaces($context)->toUrl(), 'Namespaces'],
-                default => [Route::forResources($context, $objectKind)->toUrl(), $objectKind->pluralTitle()],
-            };
-        ?>
+<?php foreach (ObjectKind::cases() as $objectKind): ?>
 
-        <p>
-            <a href="<?= $url ?>"><?= h($linkText) ?></a>
-        </p>
+    <?php
+        [$url, $linkText] = match ($objectKind) {
+            ObjectKind::NAMESPACE => [Route::forNamespaces($context)->toUrl(), 'Namespaces'],
+            default => [Route::forResources($context, $objectKind)->toUrl(), $objectKind->pluralTitle()],
+        };
+    ?>
 
-    <?php endforeach; ?>
-<?php DefaultLayout::close(); ?>
+    <p>
+        <a href="<?= $url ?>"><?= h($linkText) ?></a>
+    </p>
+
+<?php endforeach; ?>
