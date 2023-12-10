@@ -110,7 +110,7 @@ class Kubernetes
         bool $showNewestFirst = true,
     ): array
     {
-        $command = "kubectl logs";
+        $command = 'kubectl logs --all-containers';
         $command .= ' --context=' . \escapeshellarg($context);
         $command .= ' --namespace=' . \escapeshellarg($namespace);
         $command .= ' ' . \escapeshellarg($podName);
@@ -129,7 +129,7 @@ class Kubernetes
         bool $showNewestFirst = true,
     ): array
     {
-        $command = 'kubectl logs --all-containers ';
+        $command = 'kubectl logs --all-containers';
         $command .= ' --context=' . \escapeshellarg($context);
         $command .= ' --namespace=' . \escapeshellarg($namespace);
         $command .= ' -l ' . \escapeshellarg($selector);
