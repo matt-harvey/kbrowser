@@ -87,12 +87,12 @@ class DefaultLayout
                 <?= h($errorMessage) ?>
             </p>
             <?php exit; ?>
-        <?php endif; ?>
+        <?php endif; /** @phpstan-ignore-line */ ?>
 
         <?php
     }
 
-    private function __destruct()
+    public function __destruct()
     {
         ?>
         </body>
