@@ -47,7 +47,14 @@ foreach ($lines as $line) {
         }
     }
     if (\preg_match('/^Selector:\s+([^\s]+)$/', $line, $matches)) {
-        $selectors = \explode(',', $matches[1]);
+        $selectors = [];
+        $segments = \explode(',', $matches[1]);
+        foreach ($segments as $segment) {
+            $segment = \trim($segment);
+            if ($segment !== '<unset>') {
+                $selectors[] = $segment;
+            }
+        }
     }
 }
 
