@@ -112,6 +112,22 @@ class Route
         );
     }
 
+    public static function forSelectorLogs(
+        string $context,
+        string $namespace,
+        string $selector,
+        bool $showNewestFirst = true,
+    ): self
+    {
+        $query = [
+            'context' => $context,
+            'namespace' => $namespace,
+            'selector' => $selector,
+            'order' => $showNewestFirst ? 'newest-first' : 'oldest-first',
+        ];
+        return new self('/selector-logs?' . \http_build_query($query), $selector);
+    }
+
     /** @return array<string, ?string> */
     public function toBreadcrumb(bool $navigable = true): array
     {

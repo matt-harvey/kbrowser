@@ -29,9 +29,13 @@ $lines = \explode(PHP_EOL, $objectDescription);
 $ownerUrl = null;
 $ownerName = null;
 $ownerKindStr = null;
+$selectors = [];
 foreach ($lines as $line) {
-    if (\preg_match('/^(Controlled By):\s+([^\s]+)$/', $line, $matches)) {
-        [$ownerKindStr, $ownerName] = \explode('/', $matches[2]);
+    if ($ownerName !== null && $selectors !== null) {
+        break;
+    }
+    if (\preg_match('/^Controlled By:\s+([^\s]+)$/', $line, $matches)) {
+        [$ownerKindStr, $ownerName] = \explode('/', $matches[1]);
         $ownerKind = ObjectKind::tryFrom($ownerKindStr);
         if ($ownerKind !== null) {
             $ownerUrl = match (true) {
@@ -40,8 +44,10 @@ foreach ($lines as $line) {
                 default =>
                     Route::forNonNamespacedResource($context, $ownerKind, $ownerName)->toUrl(),
             };
-            break;
         }
+    }
+    if (\preg_match('/^Selector:\s+([^\s]+)$/', $line, $matches)) {
+        $selectors = \explode(',', $matches[1]);
     }
 }
 
@@ -62,21 +68,35 @@ $breadcrumbs = [
     [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
 <?php endif; ?>
 
-<?php if ($objectKind === ObjectKind::POD): ?>
-    <div>
-        <br>
-        <button>
-            <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
-                View logs
-            </a>
-        </button>
-        <br>
-        <br>
-    </div>
-<?php endif; ?>
-
 <div>
     <pre>
 <?= h($objectDescription) ?>
     </pre>
 </div>
+
+<?php if ($objectKind === ObjectKind::POD || \count($selectors) != 0): ?>
+    <br>
+    <b>Logs:</b>
+<?php endif; ?>
+
+<?php if ($objectKind === ObjectKind::POD): ?>
+    <div>
+        <br>
+        For pod:
+        <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
+            <?= h($objectName) ?>
+        </a>
+        <br>
+    </div>
+<?php endif; ?>
+
+<?php foreach ($selectors as $selector): ?>
+    <div>
+        <br>
+        For selector:
+        <a href="<?= Route::forSelectorLogs($context, $namespace, $selector, true) ?>">
+            <?= h($selector) ?>
+        </a>
+        <br>
+    </div>
+<?php endforeach; ?>

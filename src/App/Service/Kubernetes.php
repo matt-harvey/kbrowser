@@ -121,6 +121,25 @@ class Kubernetes
         return $lines;
     }
 
+    /** @return array<string> */
+    public function getSelectorLogs(
+        string $context,
+        string $namespace,
+        string $selector,
+        bool $showNewestFirst = true,
+    ): array
+    {
+        $command = "kubectl logs";
+        $command .= ' --context=' . \escapeshellarg($context);
+        $command .= ' --namespace=' . \escapeshellarg($namespace);
+        $command .= ' -l ' . \escapeshellarg($selector);
+        $lines = $this->runConsoleCommand($command);
+        if ($showNewestFirst) {
+            $lines = \array_reverse($lines);
+        }
+        return $lines;
+    }
+
     public function getObjectsTable(
         string $context,
         ObjectKind $objectKind,
