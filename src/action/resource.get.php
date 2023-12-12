@@ -64,7 +64,7 @@ $breadcrumbs = [
     Route::forNamespaces($context)->toBreadcrumb(),
     Route::forNamespace($context, $namespace)->toBreadcrumb(),
     Route::forResources($context, $objectKind, $namespace)->toBreadcrumb(),
-    [\strval($objectName) => null],
+    Route::forNamespacedResource($context, $objectKind, $objectName, $namespace)->toBreadcrumb(false),
 ];
 ?>
 

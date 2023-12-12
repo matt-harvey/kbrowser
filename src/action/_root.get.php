@@ -7,9 +7,7 @@ use App\Route;
 
 $kubernetes = getKubernetes();
 $title = 'KBrowser';
-$breadcrumbs = [
-    [HOME_CHAR => null],
-];
+$breadcrumbs = [Route::forHome()->toBreadcrumb(false)];
 $contexts = $kubernetes->getContexts();
 ?>
 

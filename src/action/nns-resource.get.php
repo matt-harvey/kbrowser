@@ -27,7 +27,7 @@ $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
     Route::forResources($context, $objectKind)->toBreadcrumb(),
-    [\strval($objectName)  => null],
+    Route::forNonNamespacedResource($context, $objectKind, $objectName)->toBreadcrumb(false),
 ];
 ?>
 

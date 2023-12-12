@@ -11,7 +11,7 @@ $title = 'KBrowser';
 $context = $_GET['context'] ?? die('Context not provided');
 $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
-    [simplifiedContextName($context) => null],
+    Route::forContext($context)->toBreadcrumb(false),
 ];
 ?>
 

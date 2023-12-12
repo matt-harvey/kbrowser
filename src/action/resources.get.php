@@ -20,7 +20,7 @@ if ($namespace === null) {
     $breadcrumbs = [
         Route::forHome()->toBreadcrumb(),
         Route::forContext($context)->toBreadcrumb(),
-        [$objectKind->pluralSmallTitle() => null],
+        Route::forResources($context, $objectKind, $namespace)->toBreadcrumb(false),
     ];
 } else {
     $table = $kubernetes->getObjectsTable($context, $objectKind, $namespace, false);
@@ -29,7 +29,7 @@ if ($namespace === null) {
         Route::forContext($context)->toBreadcrumb(),
         Route::forNamespaces($context)->toBreadcrumb(),
         Route::forNamespace($context, $namespace)->toBreadcrumb(),
-        [$objectKind->pluralSmallTitle() => null],
+        Route::forResources($context, $objectKind, $namespace)->toBreadcrumb(false),
     ];
 }
 ?>

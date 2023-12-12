@@ -30,7 +30,7 @@ $breadcrumbs = [
     Route::forHome()->toBreadcrumb(),
     Route::forContext($context)->toBreadcrumb(),
     Route::forNamespaces($context)->toBreadcrumb(),
-    [\strval($namespace) => null],
+    Route::forNamespace($context, $namespace)->toBreadcrumb(false),
 ];
 
 ?>

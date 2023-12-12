@@ -128,10 +128,9 @@ class Route
         return new self('/selector-logs?' . \http_build_query($query), $selector);
     }
 
-    /** @return array<string, ?string> */
-    public function toBreadcrumb(bool $navigable = true): array
+    public function toBreadcrumb(bool $navigable = true): Breadcrumb
     {
-        return [$this->breadcrumbName => ($navigable ? $this->toUrl() : null)];
+        return new Breadcrumb($this->breadcrumbName, ($navigable ? $this->toUrl() : null));
     }
 
     public function toUrl(): string

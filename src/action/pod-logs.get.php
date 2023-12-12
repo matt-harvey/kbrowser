@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Breadcrumb;
 use App\Exception\NotFoundException;
 use App\Layout\DefaultLayout;
 use App\ObjectKind;
@@ -32,7 +33,7 @@ $breadcrumbs = [
     Route::forNamespace($context, $namespace)->toBreadcrumb(),
     Route::forResources($context, $objectKind, $namespace)->toBreadcrumb(),
     Route::forNamespacedResource($context, $objectKind, $podName, $namespace)->toBreadcrumb(),
-    ['logs' => null],
+    new Breadcrumb('logs', null),
 ];
 ?>
 

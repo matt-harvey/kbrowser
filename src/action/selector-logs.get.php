@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Exception\NotFoundException;
+use App\Breadcrumb;
 use App\Layout\DefaultLayout;
-use App\ObjectKind;
 use App\Route;
 
 $kubernetes = getKubernetes();
@@ -21,8 +20,8 @@ $breadcrumbs = [
     Route::forContext($context)->toBreadcrumb(),
     Route::forNamespaces($context)->toBreadcrumb(),
     Route::forNamespace($context, $namespace)->toBreadcrumb(),
-    ['logs' => null],
-    [\strval($selector) => null],
+    new Breadcrumb('logs', null),
+    new Breadcrumb('selector', null),
 ];
 ?>
 
