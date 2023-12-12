@@ -75,35 +75,35 @@ $breadcrumbs = [
     [controlled by <a href="<?= $ownerUrl ?>"><?= h("$ownerKindStr/$ownerName") ?></a>]
 <?php endif; ?>
 
+<?php if ($objectKind === ObjectKind::POD || \count($selectors) != 0): ?>
+    <div>
+        <div style="border: 1px solid burlywood; padding: 5px; margin: 1em 0 1em 0; background-color: #f9f9f9; display: inline-block;">
+            <?php if ($objectKind === ObjectKind::POD): ?>
+                <div style="margin-top: 0.25em">
+                    Logs for pod:
+                    <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
+                        <?= h($objectName) ?>
+                    </a>
+                    <br>
+                </div>
+            <?php endif; ?>
+
+            <?php foreach ($selectors as $selector): ?>
+                <div style="margin-top: 0.25em">
+                    Logs for selector:
+                    <a href="<?= Route::forSelectorLogs($context, $namespace, $selector, true) ?>">
+                        <?= h($selector) ?>
+                    </a>
+                    <br>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div>
     <pre>
 <?= h($objectDescription) ?>
     </pre>
 </div>
 
-<?php if ($objectKind === ObjectKind::POD || \count($selectors) != 0): ?>
-    <br>
-    <b>Logs:</b>
-<?php endif; ?>
-
-<?php if ($objectKind === ObjectKind::POD): ?>
-    <div>
-        <br>
-        For pod:
-        <a href="<?= Route::forPodLogs($context, $namespace, $objectName, true) ?>">
-            <?= h($objectName) ?>
-        </a>
-        <br>
-    </div>
-<?php endif; ?>
-
-<?php foreach ($selectors as $selector): ?>
-    <div>
-        <br>
-        For selector:
-        <a href="<?= Route::forSelectorLogs($context, $namespace, $selector, true) ?>">
-            <?= h($selector) ?>
-        </a>
-        <br>
-    </div>
-<?php endforeach; ?>
