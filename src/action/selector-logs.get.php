@@ -21,7 +21,7 @@ $breadcrumbs = [
     Route::forNamespaces($context)->toBreadcrumb(),
     Route::forNamespace($context, $namespace)->toBreadcrumb(),
     new Breadcrumb('logs', null),
-    new Breadcrumb('selector', null),
+    new Breadcrumb($selector, null),
 ];
 ?>
 
