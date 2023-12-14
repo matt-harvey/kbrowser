@@ -138,6 +138,10 @@ enum ObjectKind: string
                     ->add($statusColumn)
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
+                    ->add(Column::fromJsonPath('Node', 'spec.nodeName', 'node', function (string $context, mixed $dataSource): string {
+                        $nodeName = $dataSource['spec']['nodeName'];
+                        return Route::forNonNamespacedResource($context, ObjectKind::NODE, $nodeName)->toUrl();
+                    }))
                     ->add($createdColumn)
                     ->add(new Column('', 'logs', fn () => 'View logs', function (string $context, mixed $dataSource): string {
                         $podName = $dataSource['metadata']['name'];

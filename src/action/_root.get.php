@@ -9,6 +9,7 @@ $kubernetes = getKubernetes();
 $title = 'KBrowser';
 $breadcrumbs = [Route::forHome()->toBreadcrumb(false)];
 $contexts = $kubernetes->getContexts();
+
 ?>
 
 <?php DefaultLayout::use($title, $breadcrumbs) ?>
