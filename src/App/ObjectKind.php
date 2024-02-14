@@ -59,8 +59,7 @@ enum ObjectKind: string
                 self::NAMESPACE,
                 self::NODE,
                 self::PERSISTENT_VOLUME,
-                self::STORAGE_CLASS,
-                self::SERVICE_ACCOUNT => false,
+                self::STORAGE_CLASS => false,
             default => true,
         };
     }
@@ -231,10 +230,6 @@ enum ObjectKind: string
                     ))
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
-                    ->add($createdColumn),
-            self::SERVICE_ACCOUNT =>
-                $table
-                    ->add(Column::fromJsonPath($this->title(), 'metadata.name', 'name'))
                     ->add($createdColumn),
 
             self::CONFIG_MAP, self::SECRET =>
