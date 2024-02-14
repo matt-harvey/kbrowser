@@ -8,6 +8,7 @@ use Carbon\Carbon;
 
 enum ObjectKind: string
 {
+    case CLUSTER_ROLE = 'ClusterRole';
     case CONFIG_MAP = 'ConfigMap';
     case CRON_JOB = 'CronJob';
     case DAEMON_SET = 'DaemonSet';
@@ -24,6 +25,7 @@ enum ObjectKind: string
     case REPLICA_SET = 'ReplicaSet';
     case SECRET = 'Secret';
     case SERVICE = 'Service';
+    case SERVICE_ACCOUNT = 'ServiceAccount';
     case STORAGE_CLASS = 'StorageClass';
 
     public function smallTitle(): string
@@ -53,7 +55,12 @@ enum ObjectKind: string
     public function isNamespaced(): bool
     {
         return match ($this) {
-            self::NAMESPACE, self::NODE, self::PERSISTENT_VOLUME, self::STORAGE_CLASS => false,
+            self::CLUSTER_ROLE,
+                self::NAMESPACE,
+                self::NODE,
+                self::PERSISTENT_VOLUME,
+                self::STORAGE_CLASS,
+                self::SERVICE_ACCOUNT => false,
             default => true,
         };
     }
@@ -224,6 +231,10 @@ enum ObjectKind: string
                     ))
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
+                    ->add($createdColumn),
+            self::SERVICE_ACCOUNT =>
+                $table
+                    ->add(Column::fromJsonPath($this->title(), 'metadata.name', 'name'))
                     ->add($createdColumn),
 
             self::CONFIG_MAP, self::SECRET =>
