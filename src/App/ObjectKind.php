@@ -145,7 +145,10 @@ enum ObjectKind: string
                     ->add($ownerKindColumn)
                     ->add($ownedByColumn)
                     ->add(Column::fromJsonPath('Node', 'spec.nodeName', 'node', function (string $context, mixed $dataSource): string {
-                        $nodeName = $dataSource['spec']['nodeName'];
+                        $nodeName = $dataSource['spec']['nodeName'] ?? null;
+                        if ($nodeName === null) {
+                            return '';
+                        }
                         return Route::forNonNamespacedResource($context, ObjectKind::NODE, $nodeName)->toUrl();
                     }))
                     ->add($createdColumn)
