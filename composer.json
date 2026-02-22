@@ -5,7 +5,7 @@
     "license": "Proprietary",
     "autoload": {
         "psr-4": {
-            "App\\": "src/App"
+            "App\\": "server/App"
         }
     },
     "authors": [
@@ -15,9 +15,12 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.5",
         "ext-mbstring": "*",
-        "nesbot/carbon": "^2.72"
+        "nesbot/carbon": "^2.72",
+        "substancephp/http": "dev-html",
+        "substancephp/container": "^0.6.1",
+        "monolog/monolog": "^3.10"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.10"
