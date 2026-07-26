@@ -15,7 +15,7 @@ use SubstancePHP\HTTP\Exception\BaseException\UserError;
 
 \date_default_timezone_set('UTC');
 
-\error_reporting(\E_ALL | \E_STRICT);
+\error_reporting(\E_ALL & ~\E_DEPRECATED);
 
 \set_exception_handler(function (\Throwable $exception): void {
     if ($exception instanceof UserError) {
