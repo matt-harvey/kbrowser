@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http;
 
-// use App\Http\Middleware\ErrorHandlerMiddleware; // FIXNOW
+use Middlewares\Whoops;
 use Psr\Container\ContainerInterface;
 use SubstancePHP\Container\Container;
 use SubstancePHP\HTTP\ContextFactory as HttpContextFactory;
@@ -21,7 +21,7 @@ class Provider implements ProviderInterface
             Container::class => fn ($c) => $c,
             ContainerInterface::class => fn ($c) => $c,
             EnvironmentInterface::class => fn () => $environment,
-            // ErrorHandlerMiddleware::class => Container::autowire(...), // FIXNOW
+            Whoops::class => Container::autowire(...),
             HttpContextFactoryInterface::class => fn () => new HttpContextFactory(),
             'substance.http.default-content-type' => fn () => 'text/html',
         ];

@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 use App\ApplicationProvider;
-// use App\Http\Middleware\ErrorHandlerMiddleware; // FIXNOW
-// use App\Http\Middleware\RateLimiterMiddleware; // FIXNOW
 use App\Http\Provider as HttpProvider;
+use Middlewares\Whoops;
 use Psr\Log\LoggerInterface;
 use SubstancePHP\HTTP\Application;
-use SubstancePHP\HTTP\Middleware\MethodNormalizerMiddleware;
 use SubstancePHP\HTTP\Middleware\RouteActorMiddleware;
 use SubstancePHP\HTTP\Middleware\RouteMatcherMiddleware;
 use SubstancePHP\HTTP\SubstanceProvider;
@@ -17,6 +15,10 @@ define('SUBSTANCE_START_NANOSECONDS', \intval(\hrtime(true)));
 
 require \dirname(__DIR__) . '/bootstrap.php';
 
+/**
+ * There is no authentication, no rate limiter, etc. because this application is intended to be
+ * run locally, only.
+ */
 $application = Application::make(
     env: $_ENV,
     actionRoot: HTTP_ACTION_ROOT,
@@ -27,8 +29,7 @@ $application = Application::make(
         HttpProvider::class,
     ],
     middlewares: [
-        // ErrorHandlerMiddleware::class, // FIXNOW
-        MethodNormalizerMiddleware::class,
+        Whoops::class,
         RouteMatcherMiddleware::class,
         RouteActorMiddleware::class,
     ],
