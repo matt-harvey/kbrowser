@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Enum\ObjectKind;
 use App\Exception\NotFoundException;
 use App\Table;
+use App\Util\KubernetesNaming;
 
 class Kubernetes
 {
@@ -95,7 +96,7 @@ class Kubernetes
             $command .= " --namespace=$escapedNamespace";
         }
         $output = $this->runConsoleCommand($command);
-        return \array_map(simplifiedObjectName(...), $output);
+        return \array_map(KubernetesNaming::simplifyObjectName(...), $output);
     }
 
     /**

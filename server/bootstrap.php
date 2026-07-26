@@ -53,15 +53,3 @@ use SubstancePHP\HTTP\Exception\BaseException\UserError;
         );
     }
 );
-
-// global helper functions // FIXNOW Get rid of these
-
-function simplifiedObjectName(string $fullObjectName): string
-{
-    return \preg_replace('|^.+/|', '', $fullObjectName);
-}
-
-function simplifiedContextName(string $fullName): string
-{
-    return \preg_replace('|^.+/|', '', $fullName);
-}

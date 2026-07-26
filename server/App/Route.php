@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use App\Enum\ObjectKind;
 use App\Html\Breadcrumb;
+use App\Util\KubernetesNaming;
 
 class Route
 {
@@ -23,7 +26,7 @@ class Route
     {
         return new self(
             '/context?' . \http_build_query(['context' => $context]),
-            simplifiedContextName($context),
+            KubernetesNaming::simplifyObjectName($context),
         );
     }
 
@@ -75,7 +78,7 @@ class Route
         ];
         return new self(
             '/resource?' . \http_build_query($query),
-            simplifiedObjectName($resourceName),
+            KubernetesNaming::simplifyObjectName($resourceName),
         );
     }
 
@@ -92,7 +95,7 @@ class Route
         ];
         return new self(
             '/nns-resource?' . \http_build_query($query),
-            simplifiedObjectName($resourceName),
+            KubernetesNaming::simplifyObjectName($resourceName),
         );
     }
 
@@ -111,7 +114,7 @@ class Route
         ];
         return new self(
             '/pod-logs?' . \http_build_query($query),
-            simplifiedObjectName($podName),
+            KubernetesNaming::simplifyObjectName($podName),
         );
     }
 
